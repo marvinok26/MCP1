@@ -5,7 +5,7 @@ MCP1 is a modular Model Context Protocol platform for local development work and
 ## Operating modes
 
 - **Personal:** a local stdio server for project discovery, code/document search, safe file reading, and Git review.
-- **Business:** a remote Streamable HTTP server with bearer-token authentication, per-tool scopes, redacted audit events, rate limits, and configured system health checks.
+- **Business:** a remote Streamable HTTP server with OIDC/JWT bearer-token validation, per-tool scopes, redacted audit events, rate limits, and configured system health checks. OAuth sign-in and discovery are not implemented yet.
 
 The modes share project metadata and integration contracts. They do not share credentials or execution privileges. Business tools call application-owned APIs; they do not connect directly to production databases.
 
@@ -56,6 +56,7 @@ npm run start:business
 - [Comprehensive implementation to-do](docs/MCP_TODO.md)
 - [Tool catalogue](docs/TOOLS.md)
 - [Security model](docs/SECURITY.md)
+- [Business identity and client authentication](docs/IDENTITY.md)
 - [Deployment and operations](docs/DEPLOYMENT.md)
 - [Adding an integration](docs/ADDING_INTEGRATIONS.md)
 - [Application integration readiness](docs/INTEGRATION_READINESS.md)

@@ -13,6 +13,8 @@ Required settings:
 - `BUSINESS_JWKS_URL`: trusted OIDC signing-key endpoint.
 - `BUSINESS_ALLOWED_HOSTS`: comma-separated hostnames accepted by the service.
 
+The identity provider and remote MCP clients are still awaiting organization confirmation. Do not treat the current bearer-token verifier as a complete interactive OAuth deployment: authorization discovery and provider/client flow validation are rollout prerequisites. See [IDENTITY.md](IDENTITY.md).
+
 Recommended settings:
 
 - `BUSINESS_HOST=127.0.0.1` for local development, or the host-required interface in production.
