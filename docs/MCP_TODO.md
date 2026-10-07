@@ -116,10 +116,10 @@ These changes belong in the respective application repositories. No record-level
 
 ## Phase 6 — Personal development improvements
 
-- [ ] Add repository-aware documentation/resource tools without reading secrets or generated artifacts.
+- [x] Add a bounded repository documentation resource template without reading secrets or generated artifacts; exercise it with the selected local client before relying on resource support.
 - [ ] Add optional browser automation for local/staging UI flows using synthetic data.
 - [ ] Add explicit command profiles for safe project tasks; never expose a generic shell tool.
-- [ ] Add configurable project roots and clear handling for unavailable paths, missing `rg`, and non-Git directories.
+- [x] Add configurable project roots and clear handling for unavailable paths, missing `rg`, and non-Git directories; root overrides are documented in `.env.example` and `TOOLS.md`.
 - [ ] Document client connection examples for the actual personal clients in use.
 - [ ] Add a user-configurable confirmation policy before any future file-write or command-execution tools.
 
@@ -158,3 +158,5 @@ These changes belong in the respective application repositories. No record-level
 - **2026-10-08:** Recorded the current token lifecycle boundary and a provider staging acceptance sequence. The verifier checks expiry and token scopes per request, but self-contained tokens are not immediately revoked when provider assignments change; end-to-end key rotation and revocation checks remain open until a provider is selected.
 - **2026-10-08:** Drafted the interim classification, audit access, retention, and deletion policy in `DATA_GOVERNANCE.md` and linked it from security and deployment guidance. The exact retention schedule and accountable privacy/legal decision-maker are still organization decisions, and no automated expiry exists; the checklist remains open and real personal data must stay out of the pilot.
 - **2026-10-08:** Set Node.js 24.21.0/npm 11.19.0 as the local baseline and Node.js 22.23.3/npm 10.9.9 as the compatibility lane; cPanel availability still requires confirmation against the actual hosting account. Recorded the locked SDK's legacy protocol versions, the unsupported 2026 protocol era, and current client verification limits. Added GitHub Actions CI for Node 22/24 install, build, tests, and high-severity dependency audit, with actions pinned to immutable commit SHAs. Added weekly Dependabot updates for npm and workflow actions and a scheduled CI dependency audit. The workflow will provide its first run result after push; no local tests were run during this work.
+- **2026-10-08:** Added the personal `project-documentation` resource template. It lists only bounded documentation files, uses project-relative URIs, skips hidden paths and unavailable roots, and revalidates every read against the existing root and sensitive-path rules. Named-client resource interoperability remains pending.
+- **2026-10-08:** Improved personal tool errors for missing project paths, missing ripgrep, and non-Git project directories. Documented the existing environment-based root overrides. No tests were run locally; CI will build and exercise the existing suite on the next push.

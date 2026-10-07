@@ -12,6 +12,12 @@
 
 Personal project keys: `ulterpos`, `tranquil`, `devspark`, `social-apps`, and `renegade`.
 
+Project roots can be overridden with the corresponding `PROJECT_<KEY>_PATH` settings in `.env`. An unavailable root produces an actionable configuration message; search reports a missing ripgrep installation; Git review reports when a configured root is not a Git repository.
+
+## Personal resources
+
+The stdio server exposes one `project-documentation` resource template with URIs in the form `mcp1-doc://<project>/<file>`. Its catalogue includes each configured project's root `README.md` and up to 40 files per project from the `docs/` directory tree, with a 200-resource overall cap. It lists only Markdown, MDX, reStructuredText, and text files, skips hidden directories and excluded paths, and reads files on demand up to 128 KB. Resource reads pass through the same real-path and secret/generated-path exclusions as `project_read_file`; unavailable project roots are omitted.
+
 ## Business mode
 
 | Tool | Required scope | Purpose | Data/action |

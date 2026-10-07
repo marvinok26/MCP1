@@ -6,10 +6,10 @@ The lockfile resolves `@modelcontextprotocol/sdk` 1.32.1 from the declared v1 de
 
 | Connection | MCP1 mode | Wire behavior | Authentication | Client status |
 | --- | --- | --- | --- | --- |
-| Local developer client | stdio | Legacy initialize handshake; protocol versions listed above | Local process access; tools are limited to configured project roots | Exercised with the MCP SDK client against harmless project README files; `.env` access was refused. Named desktop clients are not selected. |
+| Local developer client | stdio | Legacy initialize handshake; protocol versions listed above; exposes documentation resources | Local process access; tools and resources are limited to configured project roots | Tool path was exercised with the MCP SDK client against harmless project README files; `.env` access was refused. The new resource template still needs a client interoperability exercise. Named desktop clients are not selected. |
 | Remote business client | Streamable HTTP at `/mcp` | Legacy initialize handshake; stateless JSON responses | Bearer JWT validation; OAuth resource metadata is opt-in, and login/token issuance are not implemented | Local SDK integration exercised; actual products and OAuth flows remain unselected and unverified. |
 
-MCP1's transport support does not imply every client supports the same features. Before deployment, record each named client's supported transport, protocol version, authentication flow, proxy behavior, and any required streaming/session headers. Keep an integration test for each client and hosting path.
+MCP1's transport support does not imply every client supports the same features. Before deployment, record each named client's supported transport, protocol version, authentication flow, resource support, proxy behavior, and any required streaming/session headers. Keep an integration test for each client and hosting path.
 
 ## Upgrade and support policy
 

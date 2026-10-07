@@ -8,6 +8,20 @@ import { allProjects, getProject, resolveProjectFile } from './projects.js';
 const execFileAsync = promisify(execFile);
 const textResult = (text: string) => ({ content: [{ type: 'text' as const, text }] });
 
+async function runGit(projectRoot: string, args: string[], operation: 'status' | 'diff'): Promise<string> {
+  try {
+    const { stdout } = await execFileAsync('git', ['-C', projectRoot, ...args], { maxBuffer: operation === 'status' ? 100_000 : 500_000, timeout: 5_000 });
+    return stdout;
+  } catch (error) {
+    const details = error as { code?: string | number; stderr?: string; path?: string };
+    if (details.code === 'ENOENT' && details.path === 'git') throw new Error('Git is not installed on this machine.');
+    if (details.code === 128 && /cannot change to|not a git repository/i.test(details.stderr ?? '')) {
+      throw new Error('This configured project path is unavailable or is not a Git repository.');
+    }
+    throw new Error(`Git ${operation} is unavailable. Check that the project is readable and Git is installed.`);
+  }
+}
+
 export function registerPersonalTools(server: McpServer): void {
   server.registerTool('project_list', {
     title: 'List configured projects',
@@ -20,7 +34,13 @@ export function registerPersonalTools(server: McpServer): void {
     inputSchema: { project: z.string(), file: z.string().max(500) },
   }, async ({ project: projectKey, file }) => {
     const project = getProject(projectKey);
-    const absolute = await resolveProjectFile(project, file);
+    let absolute: string;
+    try {
+      absolute = await resolveProjectFile(project, file);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') throw new Error('The configured project path or requested file is unavailable. Check the project path configuration.');
+      throw error;
+    }
     const metadata = await stat(absolute);
     if (!metadata.isFile() || metadata.size > 128_000) throw new Error('Only files up to 128 KB can be read');
     const contents = await readFile(absolute, 'utf8');
@@ -50,10 +70,12 @@ export function registerPersonalTools(server: McpServer): void {
       const lines = stdout.split('\n').filter(Boolean).slice(0, limit);
       return textResult(lines.join('\n') || 'No matches.');
     } catch (error) {
-      const result = error as { code?: number; stdout?: string; message?: string };
+      const result = error as { code?: string | number; stdout?: string; path?: string };
       if (result.code === 1) return textResult('No matches.');
+      if (result.code === 'ENOENT' && result.path === 'rg') throw new Error('Ripgrep is not installed. Install `rg` and retry the search.');
+      if (result.code === 'ENOENT') throw new Error('The configured project path is unavailable. Check the project path configuration.');
       if (typeof result.stdout === 'string') return textResult(result.stdout.split('\n').filter(Boolean).slice(0, limit).join('\n'));
-      throw new Error('Project search failed. Confirm ripgrep is installed and the project is readable.');
+      throw new Error('Project search could not complete. Check that the configured project path is readable and `rg` is installed.');
     }
   });
 
@@ -63,7 +85,7 @@ export function registerPersonalTools(server: McpServer): void {
     inputSchema: { project: z.string() },
   }, async ({ project: projectKey }) => {
     const project = getProject(projectKey);
-    const { stdout } = await execFileAsync('git', ['-C', project.root, 'status', '--short', '--branch'], { maxBuffer: 100_000, timeout: 5_000 });
+    const stdout = await runGit(project.root, ['status', '--short', '--branch'], 'status');
     return textResult(stdout || 'Working tree clean.');
   });
 
@@ -73,9 +95,9 @@ export function registerPersonalTools(server: McpServer): void {
     inputSchema: { project: z.string(), staged: z.boolean().default(false) },
   }, async ({ project: projectKey, staged }) => {
     const project = getProject(projectKey);
-    const args = ['-C', project.root, 'diff', '--no-ext-diff', '--no-color', '--'];
-    if (staged) args.splice(3, 0, '--cached');
-    const { stdout } = await execFileAsync('git', args, { maxBuffer: 500_000, timeout: 5_000 });
+    const args = ['diff', '--no-ext-diff', '--no-color', '--'];
+    if (staged) args.splice(1, 0, '--cached');
+    const stdout = await runGit(project.root, args, 'diff');
     return textResult(stdout.slice(0, 100_000) || 'No diff.');
   });
 }
