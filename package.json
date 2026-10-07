@@ -9,8 +9,9 @@
   "scripts": {
     "dev:personal": "tsx src/personal.ts",
     "start:personal": "node dist/personal.js",
-    "start:business": "node dist/business.js",
-    "build": "tsc -p tsconfig.json"
+    "start:business": "node dist/business-entry.js",
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run src/personal.test.ts src/security.test.ts src/business.test.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",
@@ -23,6 +24,7 @@
     "@types/express": "^5.0.3",
     "@types/node": "^22.15.30",
     "tsx": "^4.20.3",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^5.0.3"
   }
 }

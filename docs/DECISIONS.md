@@ -19,3 +19,7 @@ Create a request-scoped server and stateless Streamable HTTP transport. This avo
 ## ADR 005: Health-only business integration as the first milestone
 
 Business health checks prove remote authentication, scope enforcement, auditing, and deployment connectivity without exposing operational records. Record workflows wait for each app's supported API contract and permissions.
+
+## ADR 006: Vitest for automated checks
+
+Use Vitest with Node's built-in assertions for the automated suite. The supplied Node 22.22.0 runtime crashes in its built-in test runner because an internal `brace-expansion` module is missing; Vitest runs the tests successfully and also supports the actual HTTP/MCP integration checks.

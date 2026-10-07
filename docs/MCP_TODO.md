@@ -32,7 +32,7 @@ This is the working delivery checklist for personal and business MCP functionali
 - [x] Create and commit the npm lockfile.
 - [x] Install the locked dependencies and run the TypeScript build/typecheck; resolve the compiler errors found on 2026-10-08.
 - [ ] Confirm and document a supported Node/npm pairing for local and cPanel runtimes; npm 12 warns that this environment's Node 22.22.0 is below its supported patch range, although install and build completed.
-- [ ] Add automated tests for path traversal, secret exclusions, JWT issuer/audience/signature/expiry, scopes, CORS/Host checks, limits, audit redaction, and MCP transport handling.
+- [x] Add automated tests for path traversal, secret exclusions, JWT issuer/audience/signature/expiry, scopes, CORS/Host checks, per-IP/user/global limits, audit redaction, and Streamable HTTP MCP transport handling; 3 files and 6 tests pass.
 - [ ] Exercise personal stdio tools with an MCP client or Inspector against harmless files in all five configured projects.
 - [ ] Exercise business Streamable HTTP initialization and tool calls with valid, expired, wrong-audience, and insufficient-scope tokens.
 - [ ] Review current MCP SDK/spec compatibility and record the supported client/protocol matrix.
@@ -136,7 +136,7 @@ These changes belong in the respective application repositories. No record-level
 
 ## Current next actions
 
-1. Add automated security/protocol coverage, then exercise both MCP transports with a client.
+1. Exercise the personal stdio tools with an MCP client against harmless files in the configured project roots.
 2. Confirm the chosen OIDC provider and business client authentication behavior.
 3. Verify the cPanel plan with a non-production Streamable HTTP pilot.
 4. Select one app and implement its identity/API bridge before exposing business records.
@@ -145,3 +145,4 @@ These changes belong in the respective application repositories. No record-level
 
 - **2026-10-08:** Initial personal/business foundation, five project registry entries, security/deployment documentation, and route/auth readiness inventory committed and pushed. Current implementation commit: `332d0b8`.
 - **2026-10-08:** Installed dependencies and passed `npm run build`; fixed the project-list export and host typing, and kept strict optional-property checking with a narrow SDK transport type bridge. npm emitted a Node/npm compatibility warning; no runtime or protocol tests were run.
+- **2026-10-08:** Added Vitest security and protocol coverage; `npm run build` passed and all 6 tests across 3 files passed, including a live Streamable HTTP MCP client exchange. The Node built-in test runner in this runtime was unusable, so Vitest is the test runner. Personal stdio client exercise remains pending.

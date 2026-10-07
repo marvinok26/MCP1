@@ -45,6 +45,7 @@ The remote endpoint is `/mcp`. See [deployment](docs/DEPLOYMENT.md) and [securit
 
 ```sh
 npm run build
+npm test
 npm run start:personal
 npm run start:business
 ```
