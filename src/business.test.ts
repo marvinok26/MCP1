@@ -72,6 +72,31 @@ test('HTTP boundary enforces host/origin policy and gives generic parser errors'
   }
 });
 
+test('readiness follows listener lifecycle while liveness stays available during drain', async () => {
+  const restore = setEnv('BUSINESS_ALLOWED_HOSTS', '127.0.0.1');
+  const app = createBusinessApp(async () => ({ subject: 'readiness-user', scopes: new Set() }));
+  app.locals.mcpReady = false;
+  const listener = app.listen(0, '127.0.0.1');
+  await once(listener, 'listening');
+  const address = listener.address();
+  assert.ok(address && typeof address !== 'string');
+  const baseUrl = `http://127.0.0.1:${address.port}`;
+
+  try {
+    assert.equal((await fetch(`${baseUrl}/healthz`)).status, 200);
+    assert.equal((await fetch(`${baseUrl}/readyz`)).status, 503);
+    assert.equal((await fetch(`${baseUrl}/mcp`)).status, 503);
+    app.locals.mcpReady = true;
+    assert.equal((await fetch(`${baseUrl}/readyz`)).status, 200);
+    app.locals.mcpReady = false;
+    assert.equal((await fetch(`${baseUrl}/mcp`)).status, 503);
+  } finally {
+    listener.close();
+    await once(listener, 'close');
+    restore();
+  }
+});
+
 test('Streamable HTTP exposes scoped tools and writes redacted audit records', async () => {
   const temp = await mkdtemp(path.join(os.tmpdir(), 'mcp1-audit-'));
   const previousAudit = setEnv('AUDIT_LOG_PATH', path.join(temp, 'audit.jsonl'));
@@ -238,6 +263,57 @@ test('business HTTP rate limit rejects repeated unauthenticated requests', async
     listener.close();
     await once(listener, 'close');
     restore.reverse().forEach((fn) => fn());
+  }
+});
+
+test('health-check circuit opens after five downstream failures', async () => {
+  const temp = await mkdtemp(path.join(os.tmpdir(), 'mcp1-circuit-'));
+  const previousAudit = setEnv('AUDIT_LOG_PATH', path.join(temp, 'audit.jsonl'));
+  const restore = [
+    setEnv('BUSINESS_ALLOWED_HOSTS', '127.0.0.1'),
+    setEnv('BUSINESS_ALLOWED_ORIGINS', undefined),
+    setEnv('BUSINESS_RATE_LIMIT_PER_MINUTE', '40'),
+    setEnv('BUSINESS_USER_RATE_LIMIT_PER_MINUTE', '40'),
+    setEnv('BUSINESS_GLOBAL_RATE_LIMIT_PER_MINUTE', '80'),
+    setEnv('SYSTEM_ULTERPOS_HEALTH_URL', 'https://health.example.test/healthz'),
+    setEnv('SYSTEM_ULTERPOS_HEALTH_TOKEN', undefined),
+  ];
+  const originalFetch = globalThis.fetch;
+  let downstreamCalls = 0;
+  globalThis.fetch = async (input, init) => {
+    const requestedUrl = input instanceof Request ? input.url : String(input);
+    if (new URL(requestedUrl).hostname === 'health.example.test') {
+      downstreamCalls += 1;
+      return new Response('downstream failure body must not be returned', { status: 503 });
+    }
+    return originalFetch(input, init);
+  };
+  const identity: BusinessIdentity = { subject: 'health-check-user', scopes: new Set(['system:ulterpos:health:read']) };
+  const app = createBusinessApp(async () => identity);
+  const listener = app.listen(0, '127.0.0.1');
+  await once(listener, 'listening');
+  const address = listener.address();
+  assert.ok(address && typeof address !== 'string');
+  const transport = new StreamableHTTPClientTransport(new URL(`http://127.0.0.1:${address.port}/mcp`));
+  const client = new Client({ name: 'mcp1-circuit-test', version: '0.1.0' });
+
+  try {
+    await client.connect(transport as unknown as Transport);
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      const result = await client.callTool({ name: 'business_system_health', arguments: { system: 'ulterpos' } });
+      assert.equal(result.isError, undefined);
+    }
+    const open = await client.callTool({ name: 'business_system_health', arguments: { system: 'ulterpos' } });
+    assert.equal(open.isError, true);
+    assert.equal(downstreamCalls, 5);
+  } finally {
+    await client.close();
+    listener.close();
+    await once(listener, 'close');
+    globalThis.fetch = originalFetch;
+    restore.reverse().forEach((fn) => fn());
+    previousAudit();
+    await rm(temp, { recursive: true, force: true });
   }
 });
 

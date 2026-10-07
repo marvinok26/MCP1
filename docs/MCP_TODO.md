@@ -2,7 +2,7 @@
 
 This is the working delivery checklist for personal and business MCP functionality across UlterPOS, Tranquil Pharmacy, Devspark, Social apps, and Renegade. Update the boxes in the same commit as the work. A checked item means its acceptance evidence exists; planning or documentation alone does not complete an implementation item.
 
-**Status:** foundation pushed; production business workflows remain blocked on app identity/API support.
+**Status:** local and process-level foundation is implemented. Remaining production work is gated on owner choices, hosting access, or implementation in the owning application repositories.
 
 **Branch policy:** work on `development`, push completed milestones, fast-forward `main`, and push it.
 
@@ -143,6 +143,7 @@ These changes belong in the respective application repositories. No record-level
 - Name the organization privacy/legal approver and approve numeric retention periods, deletion authority, legal holds, and backup expiry before real personal data is used.
 - Enable repository Dependabot security updates/alerts in GitHub settings; workflow and weekly update configuration are in the repository, but account settings are controlled outside Git.
 - Approve the confirmation policy before adding any personal file-write or command-execution tool. No such tool is exposed today.
+- Confirm which fixed project command profiles are permitted and whether each may write files or invoke network/deployment actions; no generic shell tool will be added.
 - Approve the business roles, thresholds, and separation-of-duties rules for write approvals before any app enables a mutating or externally visible MCP action.
 - Select the first application/API owner and authorize changes in that application's repository; MCP1 has no app-owned identity bridge or production record endpoints yet.
 
@@ -175,5 +176,5 @@ These changes belong in the respective application repositories. No record-level
 - **2026-10-08:** Improved personal tool errors for missing project paths, missing ripgrep, and non-Git project directories. Documented the existing environment-based root overrides. No tests were run locally; CI will build and exercise the existing suite on the next push.
 - **2026-10-08:** Added `/readyz`, graceful SIGTERM/SIGINT draining with a 10-second force-close deadline, a configurable per-process cap for concurrent health checks, and a per-system circuit breaker that opens after five downstream failures and permits one recovery probe after 30 seconds. These are single-process safeguards; shared rate limiting and concurrency control are still required before multi-worker deployment.
 - **2026-10-08:** Added the new-application onboarding template, documented quarterly access/integration review, and added host-neutral deployment, rollback, secret-rotation, recovery, and incident procedures. Environment-specific approvals and staging rehearsal remain outstanding.
-- **2026-10-08:** The first CI run failed because `personal-stdio.test.ts` assumed local project directories existed on hosted runners. Reworked it to create temporary fixtures for all five projects and verify documentation resource listing/read plus secret and hidden-path exclusion. `npm run build` passed and all 8 tests passed locally; the corrected workflow result is pending the next push.
+- **2026-10-08:** The first CI run failed because `personal-stdio.test.ts` assumed local project directories existed on hosted runners. Reworked it to create temporary fixtures for all five projects and verify documentation resource listing/read plus secret and hidden-path exclusion. Corrected CI passed on `development` and `main` at `46aedf0` across Node 22/24, including build, eight tests, and high-severity dependency audit. Added readiness and circuit-breaker integration coverage; the build and all 10 tests pass locally, and CI will rerun these additions on the next push.
 - **2026-10-08:** Added a host-neutral runbook for deployment/rollback, secret and signing-key rotation, incident response, backup/recovery, and monitoring. Host contacts, recovery objectives, privacy decisions, and staging rehearsal remain deployment prerequisites.
