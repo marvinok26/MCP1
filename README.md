@@ -60,6 +60,7 @@ npm run start:business
 - [Deployment and operations](docs/DEPLOYMENT.md)
 - [Adding an integration](docs/ADDING_INTEGRATIONS.md)
 - [Application integration readiness](docs/INTEGRATION_READINESS.md)
+- [Business role-to-scope mapping](docs/ROLE_SCOPE_MAPPING.md)
 - [Decision record](docs/DECISIONS.md)
 
 ## Current limits

@@ -57,3 +57,5 @@ Do not implement a plain `X-User-Id` or role header, a shared superuser token, o
 | Renegade | Organizer/admin web routes; no API route file | Event status and aggregate scan counts API |
 
 Each entry remains pending until the application API and identity bridge are implemented and reviewed in that application's repository.
+
+The cross-system role-to-scope policy and current role-model gaps are documented in [ROLE_SCOPE_MAPPING.md](ROLE_SCOPE_MAPPING.md). It does not issue grants; all record scopes remain unavailable until the app API and verified identity bridge are ready.
