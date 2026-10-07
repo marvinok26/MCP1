@@ -30,6 +30,7 @@ Application record tools must additionally call application APIs using a delegat
 - Personal paths are resolved through `realpath`, checked against the configured project root, and filtered for sensitive/generated paths.
 - External commands use `execFile` with fixed executable names and argument arrays. User text is never evaluated by a shell.
 - The HTTP service enforces configured Host names, optional browser Origin allowlisting, no-store responses, and per-process global, per-IP, and per-user rate limits.
+- Reverse-proxy IP forwarding is disabled by default. Enable trust only for the documented local proxy case where forwarded client addresses are overwritten by that proxy.
 
 ## Audit and privacy
 

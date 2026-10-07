@@ -18,6 +18,7 @@ Recommended settings:
 - `BUSINESS_HOST=127.0.0.1` for local development, or the host-required interface in production.
 - `PORT` supplied by Passenger when using a cPanel Node app.
 - `BUSINESS_ALLOWED_ORIGINS` for any browser-based MCP client origins.
+- `BUSINESS_TRUST_PROXY=true` only when the trusted local reverse proxy sanitizes and sets `X-Forwarded-For`; this allows per-IP limits to use the real client address.
 - `BUSINESS_RATE_LIMIT_PER_MINUTE` with a value appropriate to the client population.
 - `AUDIT_LOG_PATH` on a private persistent volume.
 - Per-system `SYSTEM_<KEY>_HEALTH_URL` and optional `SYSTEM_<KEY>_HEALTH_TOKEN` values.

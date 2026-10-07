@@ -15,6 +15,7 @@ const globalLimit = Number(process.env.BUSINESS_GLOBAL_RATE_LIMIT_PER_MINUTE ?? 
 const windows = new Map<string, { start: number; count: number }>();
 
 app.disable('x-powered-by');
+if (process.env.BUSINESS_TRUST_PROXY === 'true') app.set('trust proxy', 'loopback');
 app.use((req, res, next) => {
   const host = (req.headers.host ?? '').toLowerCase().split(':')[0];
   if (!hostAllowlist.has(host)) return res.status(421).json({ error: 'Unknown host' });
@@ -45,7 +46,7 @@ function takeRateLimit(key: string, limit: number, now: number): boolean {
 
 function rateLimit(req: Request, res: Response, next: NextFunction) {
   const now = Date.now();
-  const ip = req.socket.remoteAddress ?? 'unknown';
+  const ip = req.ip || req.socket.remoteAddress || 'unknown';
   if (!takeRateLimit('global', globalLimit, now) || !takeRateLimit(`ip:${ip}`, ipLimit, now)) {
     return res.status(429).json({ error: 'Rate limit exceeded' });
   }
@@ -83,6 +84,13 @@ app.all('/mcp', rateLimit, async (req, res) => {
     void transport.close();
     void server.close();
   }
+});
+
+app.use((error: unknown, _req: Request, res: Response, next: NextFunction) => {
+  if (res.headersSent) return next(error);
+  const details = error as { status?: number; statusCode?: number; type?: string };
+  const status = details.statusCode === 413 || details.status === 413 ? 413 : details.type === 'entity.parse.failed' ? 400 : 500;
+  return res.status(status).json({ error: status === 413 ? 'Request too large' : status === 400 ? 'Malformed JSON request' : 'Request failed' });
 });
 
 const port = Number(process.env.PORT ?? process.env.BUSINESS_PORT ?? 8787);
