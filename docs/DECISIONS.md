@@ -23,3 +23,7 @@ Business health checks prove remote authentication, scope enforcement, auditing,
 ## ADR 006: Vitest for automated checks
 
 Use Vitest with Node's built-in assertions for the automated suite. The supplied Node 22.22.0 runtime crashes in its built-in test runner because an internal `brace-expansion` module is missing; Vitest runs the tests successfully and also supports the actual HTTP/MCP integration checks.
+
+## ADR 007: App-owned APIs with audience-specific delegated actor tokens
+
+Each business application owns its MCP-facing API and remains responsible for authorizing the verified user against its existing permissions and record scopes. MCP1 should use a short-lived token with the application's audience, preserving the user as subject and MCP1 as actor; use OAuth Token Exchange (RFC 8693) when supported by the eventual identity provider. The app resolves the verified issuer/subject through an explicit identity link and audits the local actor. If provider exchange cannot preserve a constrained actor identity, record tools remain disabled until an alternative is reviewed. This matches the apps' different authentication stacks without allowing caller-supplied user headers or shared administrator credentials.

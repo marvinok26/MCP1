@@ -23,6 +23,28 @@ The business MCP endpoint is a protected resource, not an authorization server. 
 
 For unattended automation, use a dedicated provider client and the OAuth client-credentials grant only if the chosen MCP client and provider support it. Keep its credential in the automation host's secret store, rotate it, and grant only the required tools. Do not paste tokens into tool arguments or project configuration.
 
+## Application identity bridge decision
+
+**Selected architecture:** each business application owns a narrow API surface and performs its own authorization. The actor reaches that API in a short-lived, application-audience token that preserves the signed-in user as `sub` and identifies MCP1 as the acting client. Prefer OAuth 2.0 Token Exchange (RFC 8693) for this downstream token. Each app verifies issuer, signature, exact audience, expiry, and allowed scopes; maps the trusted `(iss, sub)` pair to a local account through an explicit identity link; then runs its normal permissions, tenant/branch/owner/field checks and audit path.
+
+This deliberately combines the app-owned API boundary with an audience-specific delegated token. The application owns the API and policy decision; the exchanged token carries a verifiable user and actor chain. MCP1 scopes remain an additional tool gate and are not copied as a replacement for the app's own permissions.
+
+Token-exchange support depends on the identity provider, which remains unselected. If the eventual provider cannot issue constrained downstream tokens that preserve the actor, stop before enabling record tools and review an alternative trust design. Do not send the MCP-audience token to an app, forward a service token plus an unsigned user header, match identities by email, or use a shared administrator credential.
+
+The bridge must fail closed when the identity link is missing, disabled, ambiguous, or out of sync. Provision and deactivate identity links through an audited app-owned path. Never accept local account IDs, tenant IDs, branch IDs, organizer IDs, or role claims from MCP tool arguments as authorization evidence.
+
+### Per-application path
+
+| Application | Bridge behavior required before a record tool ships |
+| --- | --- |
+| **UlterPOS** | Add versioned API endpoints behind an actor-token verifier. Resolve the local user and business context from the identity link; retain existing permissions, active vertical/team scope, branch scope, subscription behavior, field restrictions, and audit trail. |
+| **Tranquil Pharmacy** | Add an actor-token verifier for the selected versioned staff API and resolve a local clinic staff user. Run existing staff, preview, branch, access, idle-timeout, clinic-open, record, and `FieldAccess` checks. Never resolve the platform-admin guard for staff work. |
+| **Devspark** | Add an actor-token verifier and identity link, plus narrow content read/draft permissions. The existing binary `is_admin` middleware is not a sufficient record-scope grant. |
+| **Social apps** | Add an actor-token verifier and map to the authenticated application user. Apply instance ownership for every read or write; keep channel API credentials behind the app. |
+| **Renegade** | Add a versioned API and actor-token verifier. Apply event organizer ownership for organizer tools; keep platform administration and finance actions separately permissioned and audited. |
+
+No provider, API actor-token verifier, identity link, or record tool is implemented by this architectural decision. The bridge can be prototyped with synthetic identities after the provider and first application are chosen.
+
 ## Current implementation boundary
 
 MCP1 currently verifies bearer JWTs but does not implement OAuth authorization, Protected Resource Metadata, or authorization-server discovery. Therefore the implementation is suitable for the signed-token integration tests and controlled pilots where tokens are provisioned out of band; it is not yet a plug-and-play OAuth connection for general remote MCP clients. Before a staff rollout, confirm the target clients, implement and verify the MCP authorization discovery flow they require, and validate issuer/audience/scope behavior with the real provider.
@@ -33,4 +55,5 @@ The deployed MCP TypeScript SDK line and protocol/client compatibility are track
 
 - [MCP authorization specification, 2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization): MCP servers are OAuth resource servers; Protected Resource Metadata is required for authorization-server discovery; clients use OAuth Authorization Code with PKCE.
 - [MCP TypeScript SDK documentation](https://ts.sdk.modelcontextprotocol.io/): the installed `@modelcontextprotocol/sdk` v1 line implements the 2025-11-25 specification. Confirm the SDK/spec migration path in the compatibility review before treating this as a long-term client contract.
+- [RFC 8693: OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693.html): defines token exchange and the distinction between delegation and impersonation. MCP1's downstream design keeps the user as subject and MCP1 as actor.
 - [Auth0 Authorization Code + PKCE](https://auth0.com/docs/api/authentication/authorization-code-flow-with-pkce/authorize-with-pkce) and [Auth0 Dynamic Client Registration](https://auth0.com/docs/get-started/applications/dynamic-client-registration): references for the provisional provider candidate, not evidence that the selected MCP clients have been tested.

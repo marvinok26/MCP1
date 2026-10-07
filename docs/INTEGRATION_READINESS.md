@@ -38,13 +38,16 @@ Tools that can reach customers or publish content are externally visible actions
 
 ## Cross-system identity requirement
 
-The business MCP validates an OIDC identity, while the inspected applications currently use differing session, Sanctum, admin, organizer, or per-channel credentials. MCP scopes alone do not authorize application records. Before enabling record tools, choose and document one of:
+The business MCP validates an OIDC identity, while the inspected applications currently use differing session, Sanctum, admin, organizer, or per-channel credentials. MCP scopes alone do not authorize application records. The selected target bridge is an app-owned API that validates a short-lived, audience-specific delegated actor token, preferably issued through OAuth Token Exchange (RFC 8693):
 
-1. **Delegated identity:** the application accepts a short-lived token for the current user and performs its own permission checks.
-2. **Token exchange:** the identity provider issues an audience-specific downstream token that preserves actor identity and allowed scopes.
-3. **Application-owned MCP API:** a narrow endpoint validates an MCP service identity plus a cryptographically verified actor claim and applies the same app policies and audit rules.
+1. The original user remains the signed token's `sub`; MCP1 is identified as the actor.
+2. Each app verifies the issuer, signature, exact audience, expiry, and allowed scopes, then resolves the verified issuer/subject to a local account through an explicit identity link.
+3. The app runs its existing permission, tenant/branch/owner/field, lifecycle, and audit checks for that local user.
+4. If the selected provider cannot issue an appropriately constrained downstream token that preserves the actor, block record access until an alternative trust design is reviewed.
 
 Do not implement a plain `X-User-Id` or role header, a shared superuser token, or a database-side bypass. Those approaches sever trustworthy attribution and can widen access.
+
+See [Business identity and client authentication](IDENTITY.md) for the selected pattern and per-app requirements.
 
 ## Readiness summary
 
