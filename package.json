@@ -11,7 +11,7 @@
     "start:personal": "node dist/personal.js",
     "start:business": "node dist/business-entry.js",
     "build": "tsc -p tsconfig.json",
-    "test": "vitest run src/personal.test.ts src/security.test.ts src/business.test.ts"
+    "test": "vitest run src/personal.test.ts src/personal-stdio.test.ts src/security.test.ts src/business.test.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",
