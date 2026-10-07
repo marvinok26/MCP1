@@ -2,7 +2,7 @@
 
 ## Provider selection status
 
-The owner reports no known organization identity provider, and the remote client set is several clients or not decided. MCP1 must use the organization's existing workforce OIDC provider if one is later identified, rather than creating a second staff directory.
+The owner confirmed that the organization is not currently using an identity provider and instructed that the Auth0 recommendation remain provisional. The remote client set is several clients or not decided. No provider has been selected. When the organization chooses one, MCP1 must use that workforce OIDC provider rather than creating a second staff directory.
 
 **Provisional recommendation:** evaluate Auth0 as the managed OIDC provider for the first business pilot. It avoids operating the identity control plane alongside the MCP service on shared hosting and its documentation covers Authorization Code + PKCE and dynamic client registration. This is a recommendation, not a selected provider: first validate the actual MCP clients, organization domain, account ownership, cost, and provider behavior. Keep client authentication standards-based so a later issuer change does not alter MCP scopes or application APIs. If the team chooses self-hosted Keycloak, run it on a separately managed VPS/container with a production database, TLS, backups, recovery, monitoring, and a high-availability plan; do not place the identity service on cPanel shared hosting.
 

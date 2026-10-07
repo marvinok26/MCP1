@@ -40,7 +40,7 @@ This is the working delivery checklist for personal and business MCP functionali
 
 ## Phase 2 — Identity and business authorization
 
-- [ ] Select the organization identity provider and record its issuer, JWKS rotation, audience, token lifetime, user lifecycle, and incident revocation process; no provider is currently known. Auth0 is the provisional managed-provider candidate, pending owner decision and client compatibility review.
+- [ ] Select the organization identity provider and record its issuer, JWKS rotation, audience, token lifetime, user lifecycle, and incident revocation process; the owner confirmed no provider is currently used and wants the Auth0 recommendation kept provisional.
 - [x] Document the recommended business client authentication modes and current bearer-only implementation boundary in `IDENTITY.md`; final client compatibility remains pending selection of the actual provider and clients.
 - [ ] Define role-to-scope mapping for each business system; avoid using broad organization-wide roles as implicit data permissions.
 - [ ] Choose the application identity bridge: delegated user token, audience-specific token exchange, or app-owned MCP API with verified actor claims.
@@ -137,7 +137,7 @@ These changes belong in the respective application repositories. No record-level
 
 ## Current next actions
 
-1. Confirm or revise the provisional Auth0 recommendation and shortlist the required business MCP clients, then validate their OAuth flows against MCP1's authorization discovery implementation.
+1. When ready, select an identity provider and shortlist the required business MCP clients, then validate their OAuth flows against MCP1's authorization discovery implementation.
 2. Verify the cPanel plan with a non-production Streamable HTTP pilot.
 3. Select one app and implement its identity/API bridge before exposing business records.
 
@@ -149,3 +149,4 @@ These changes belong in the respective application repositories. No record-level
 - **2026-10-08:** Exercised personal stdio with an MCP client against README files in all five configured project roots; all reads succeeded and `.env` access was refused. `npm run build` passed and the full suite passed with 7 tests across 4 files.
 - **2026-10-08:** Exercised business Streamable HTTP with real RS256 tokens and a local JWKS endpoint. Expired and wrong-audience tokens were refused during initialization; a valid signed token initialized and listed tools, while a call lacking its tool scope was denied. `npm run build` passed and the full suite passed with 8 tests across 4 files. JWKS clients now refresh when the configured JWKS URL changes, which keeps configuration changes and isolated test issuers from reusing a stale key source.
 - **2026-10-08:** Documented the recommended staff OAuth Authorization Code + PKCE flow, separate machine-to-machine client-credentials use, identity-provider acceptance criteria, and the current bearer-only limitation. The owner confirmed no known identity provider and several/not-yet-decided business clients. Auth0 is recorded as a provisional managed-provider candidate; final selection and real client compatibility remain open.
+- **2026-10-08:** Owner confirmed the organization is not currently using an identity provider and asked to keep Auth0 provisional. No provider has been selected or configured.
