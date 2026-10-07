@@ -52,6 +52,7 @@ npm run start:business
 ## Documentation
 
 - [Product and delivery plan](docs/PLAN.md)
+- [Comprehensive implementation to-do](docs/MCP_TODO.md)
 - [Tool catalogue](docs/TOOLS.md)
 - [Security model](docs/SECURITY.md)
 - [Deployment and operations](docs/DEPLOYMENT.md)

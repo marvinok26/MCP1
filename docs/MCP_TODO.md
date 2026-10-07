@@ -1,0 +1,145 @@
+# MCP1 implementation to-do
+
+This is the working delivery checklist for personal and business MCP functionality across UlterPOS, Tranquil Pharmacy, Devspark, Social apps, and Renegade. Update the boxes in the same commit as the work. A checked item means its acceptance evidence exists; planning or documentation alone does not complete an implementation item.
+
+**Status:** foundation pushed; production business workflows remain blocked on app identity/API support.
+
+**Branch policy:** work on `development`, push completed milestones, fast-forward `main`, and push it.
+
+**Authorship:** keep commit messages and all remote-facing metadata free of AI attribution.
+
+## Phase 0 — Repository and agreed scope
+
+- [x] Clone `marvinok26/MCP1` and establish the `development` and `main` branches.
+- [x] Record the personal and business modes and all five in-scope systems.
+- [x] Choose TypeScript/Node.js and the MCP TypeScript SDK for the protocol layer.
+- [x] Define local stdio for personal development and stateless Streamable HTTP for remote business use.
+- [x] Document the first cPanel compatibility checklist and fallback hosting path.
+- [x] Inspect the application API/auth boundaries and document them in `INTEGRATION_READINESS.md`.
+- [x] Check pushed commit metadata and repository source for prohibited AI attribution; none found through commit `332d0b8`.
+- [x] Push each completed milestone to `development`, then promote it to `main`.
+
+## Phase 1 — MCP foundation
+
+- [x] Add local project discovery, safe file reading, fixed-string search, Git status, and bounded diff tools.
+- [x] Scope personal tools to configured project roots; block common secret, dependency, and generated paths.
+- [x] Keep shell execution out of the exposed tool set; call only fixed `rg` and Git subcommands with argument arrays.
+- [x] Add a remote MCP endpoint with signed JWT checks for issuer, audience, key, expiry, and allowed algorithms.
+- [x] Add per-tool business scopes, host and origin checks, body bounds, and global/IP/user process-local limits.
+- [x] Add redacted JSONL business tool audit events with generated request identifiers.
+- [x] Add opt-in HTTPS health checks for configured integrations, refusing redirects and returning minimal status.
+- [x] Document setup, security, operations, tool catalogue, decisions, integration patterns, and application readiness.
+- [x] Create and commit the npm lockfile.
+- [ ] Run a dependency install/build in an approved environment and resolve all type/runtime errors.
+- [ ] Add automated tests for path traversal, secret exclusions, JWT issuer/audience/signature/expiry, scopes, CORS/Host checks, limits, audit redaction, and MCP transport handling.
+- [ ] Exercise personal stdio tools with an MCP client or Inspector against harmless files in all five configured projects.
+- [ ] Exercise business Streamable HTTP initialization and tool calls with valid, expired, wrong-audience, and insufficient-scope tokens.
+- [ ] Review current MCP SDK/spec compatibility and record the supported client/protocol matrix.
+- [ ] Add a CI workflow for install, typecheck, unit/security tests, dependency audit, and build.
+
+## Phase 2 — Identity and business authorization
+
+- [ ] Select the organization identity provider and document the OIDC issuer, JWKS rotation, audience, token lifetime, user lifecycle, and incident revocation process.
+- [ ] Define role-to-scope mapping for each business system; avoid using broad organization-wide roles as implicit data permissions.
+- [ ] Choose the application identity bridge: delegated user token, audience-specific token exchange, or app-owned MCP API with verified actor claims.
+- [ ] Verify app authorization still applies to every operation; MCP scopes add a gate and never replace app policies.
+- [ ] Decide how staff consent/approval is represented to each MCP client, especially for writes and external publication.
+- [ ] Add OAuth Protected Resource Metadata and authorization discovery if required by the selected business clients.
+- [ ] Validate key rotation, user deactivation, scope removal, and token revocation behavior end to end.
+- [ ] Define data classification, retention, audit access, and deletion policies for MCP audit records.
+
+## Phase 3 — cPanel business pilot
+
+- [ ] Confirm the actual hosting account supports a persistent Node process and a supported runtime for the locked dependencies.
+- [ ] Deploy a non-production MCP endpoint behind HTTPS and configure exact Host and permitted Origin values.
+- [ ] Verify the chosen MCP client can initialize and make tool calls through the cPanel proxy; check required headers, POST behavior, and streaming behavior.
+- [ ] Confirm Passenger-provided port binding, restart/redeploy, environment secrets, outbound host allowlisting, logs, and process limits.
+- [ ] Configure trusted-proxy IP handling only if the proxy overwrites forwarded-address headers.
+- [ ] Verify health endpoint credentials, timeout, TLS, redirect rejection, and safe failure behavior.
+- [ ] Record capacity limits and a tested move path to a VPS/container host.
+- [ ] Do not expose production business data until identity, authorization, audit, and recovery checks pass.
+
+## Phase 4 — Application API readiness
+
+These changes belong in the respective application repositories. No record-level MCP tool should ship before its application endpoint and identity bridge are ready.
+
+### UlterPOS
+
+- [ ] Add documented, versioned, authenticated read endpoints for selected operational summaries.
+- [ ] Resolve business/tenant and branch scopes server-side; apply existing permissions and hidden-field rules.
+- [ ] Add a low-risk branch-scoped sales/stock summary and verify filters, sorting, pagination, and response limits.
+- [ ] Preserve the existing audit and subscription behavior; deny expired or out-of-scope access consistently.
+
+### Tranquil Pharmacy
+
+- [ ] Add/confirm delegated staff identity for the MCP caller through Sanctum or a reviewed token exchange.
+- [ ] Add a sync/queue health summary that contains no patient names, medication details, sale lines, or hidden fields.
+- [ ] Preserve `staff`, `branch`, `access`, `clinic.open`, record scopes, `FieldAccess`, and audit checks.
+- [ ] Verify offline queue status cannot expose or modify unsynced sale payloads.
+
+### Devspark
+
+- [ ] Add a server-to-server or delegated identity path that preserves admin permissions and audit attribution.
+- [ ] Add read-only draft identifiers/status and draft preview endpoints with field minimization.
+- [ ] Add a separate publishing preview/approval workflow; do not make ordinary content preparation publishable by default.
+- [ ] Scope contact-message summaries and replies to authorized staff; minimize personal information in MCP results.
+
+### Social apps
+
+- [ ] Define the business use cases and supported channels before adding workflow tools.
+- [ ] Design a token-safe authentication surface; never put API tokens in MCP arguments, tool output, or logs.
+- [ ] Add read-only instance/queue health tools with no recipient or message content.
+- [ ] For later messaging, enforce per-channel permissions, previews, confirmation, queue limits, idempotency, and app-side audit.
+- [ ] Keep instance reboot/logout, queue clearing, group membership, and posting tools disabled until separately approved and reviewed.
+
+### Renegade Tickets & Events
+
+- [ ] Add authenticated API routes for organizer/admin business workflows.
+- [ ] Enforce organizer ownership, event scope, admin role, and finance permissions at the app endpoint.
+- [ ] Add read-only event status and aggregate ticket-scan counts with no attendee details.
+- [ ] Add settlement/reconciliation summaries only after verifying finance-specific permissions and output fields.
+- [ ] Keep refund, settlement, event publishing, ticket modification, and attendee exports as separate explicit-approval actions.
+
+## Phase 5 — Business MCP adapters
+
+- [ ] Implement one typed adapter per application using fixed route mappings and application-owned APIs.
+- [ ] Propagate delegated identity or exchanged short-lived tokens; never trust a caller-supplied user ID/role header.
+- [ ] Map app permissions to narrow MCP scopes and keep scopes distinct across systems.
+- [ ] Bound every list, search, date range, result size, timeout, and export request.
+- [ ] Return minimum necessary fields; preserve tenant, branch, ownership, field-level, and export restrictions.
+- [ ] Make write operations separately registered, idempotent, previewable, confirmation-gated, and auditable in the owning app.
+- [ ] Add adapter-specific failure mapping, retry rules, rate limits, and correlation IDs.
+- [ ] Add integration verification using staging/synthetic data for every tool and permission boundary.
+- [ ] Update `TOOLS.md`, `INTEGRATION_READINESS.md`, and the owning application docs with each adapter release.
+
+## Phase 6 — Personal development improvements
+
+- [ ] Add repository-aware documentation/resource tools without reading secrets or generated artifacts.
+- [ ] Add optional browser automation for local/staging UI flows using synthetic data.
+- [ ] Add explicit command profiles for safe project tasks; never expose a generic shell tool.
+- [ ] Add configurable project roots and clear handling for unavailable paths, missing `rg`, and non-Git directories.
+- [ ] Document client connection examples for the actual personal clients in use.
+- [ ] Add a user-configurable confirmation policy before any future file-write or command-execution tools.
+
+## Phase 7 — Operations, scale, and governance
+
+- [ ] Move rate limiting from process memory to shared storage before multiple workers/instances.
+- [ ] Move JSONL audit output to a durable, access-controlled, append-only sink with retention/rotation and alerting.
+- [ ] Add dashboards for request volume, tool latency, downstream failures, rate limiting, and auth denials without logging business payloads.
+- [ ] Add dependency update and vulnerability review cadence.
+- [ ] Add graceful shutdown, readiness checks, downstream circuit breaking, and bounded concurrency.
+- [ ] Add deployment rollback, secret rotation, backup/recovery, and incident response runbooks.
+- [ ] Reassess cPanel when usage, availability, worker count, network isolation, or audit retention outgrows shared hosting.
+- [ ] Review tool grants and app integrations periodically; remove unused scopes and credentials.
+- [ ] Maintain a new-app onboarding checklist and require a named owner, data classification, auth model, tool catalogue, and exit criteria.
+
+## Current next actions
+
+1. Run the foundation build/typecheck and establish automated security/protocol coverage.
+2. Confirm the chosen OIDC provider and business client authentication behavior.
+3. Verify the cPanel plan with a non-production Streamable HTTP pilot.
+4. Select one app and implement its identity/API bridge before exposing business records.
+
+## Progress log
+
+- **2026-10-08:** Initial personal/business foundation, five project registry entries, security/deployment documentation, and route/auth readiness inventory committed and pushed. Current implementation commit: `332d0b8`.
