@@ -31,12 +31,12 @@ This is the working delivery checklist for personal and business MCP functionali
 - [x] Document setup, security, operations, tool catalogue, decisions, integration patterns, and application readiness.
 - [x] Create and commit the npm lockfile.
 - [x] Install the locked dependencies and run the TypeScript build/typecheck; resolve the compiler errors found on 2026-10-08.
-- [ ] Confirm and document a supported Node/npm pairing for local and cPanel runtimes; npm 12 warns that this environment's Node 22.22.0 is below its supported patch range, although install and build completed.
+- [x] Confirm and document supported Node/npm pairings for local and cPanel runtimes; Node 24.21.0/npm 11.19.0 is pinned for local work, and Node 22.23.3/npm 10.9.9 is the compatibility lane. cPanel still must offer a compatible runtime.
 - [x] Add automated tests for path traversal, secret exclusions, JWT issuer/audience/signature/expiry, scopes, CORS/Host checks, per-IP/user/global limits, audit redaction, and Streamable HTTP MCP transport handling; 3 files and 6 tests pass.
 - [x] Exercise personal stdio tools through the MCP SDK client against harmless README files in all five configured project roots; confirm `.env` access is refused.
 - [x] Exercise business Streamable HTTP initialization and tool calls with valid, expired, wrong-audience, and insufficient-scope tokens; the integration test serves a local JWKS, rejects expired/wrong-audience initialization with 401, completes a valid MCP session, and denies the health tool without its scope.
-- [ ] Review current MCP SDK/spec compatibility and record the supported client/protocol matrix.
-- [ ] Add a CI workflow for install, typecheck, unit/security tests, dependency audit, and build.
+- [x] Review current MCP SDK/spec compatibility and record the supported client/protocol matrix in `MCP_CLIENT_MATRIX.md`; named clients remain unselected, and SDK v2 migration needs a scheduled review.
+- [x] Add a CI workflow for install, typecheck, unit/security tests, dependency audit, and build across Node 22 and 24.
 
 ## Phase 2 — Identity and business authorization
 
@@ -128,7 +128,7 @@ These changes belong in the respective application repositories. No record-level
 - [ ] Move rate limiting from process memory to shared storage before multiple workers/instances.
 - [ ] Move JSONL audit output to a durable, access-controlled, append-only sink with retention/rotation and alerting.
 - [ ] Add dashboards for request volume, tool latency, downstream failures, rate limiting, and auth denials without logging business payloads.
-- [ ] Add dependency update and vulnerability review cadence.
+- [x] Add a weekly dependency update cadence for npm packages and GitHub Actions, plus a scheduled weekly dependency audit in CI; repository security-update settings still need to be enabled by an owner.
 - [ ] Add graceful shutdown, readiness checks, downstream circuit breaking, and bounded concurrency.
 - [ ] Add deployment rollback, secret rotation, backup/recovery, and incident response runbooks.
 - [ ] Reassess cPanel when usage, availability, worker count, network isolation, or audit retention outgrows shared hosting.
@@ -157,3 +157,4 @@ These changes belong in the respective application repositories. No record-level
 - **2026-10-08:** Added opt-in OAuth Protected Resource Metadata and an explicit `WWW-Authenticate` metadata pointer. The metadata uses configured canonical HTTPS resource and issuer URLs, advertises only the current MCP scopes, and is disabled by default while provider and client selection remain open. Authorization server login and client interoperability are still rollout prerequisites.
 - **2026-10-08:** Recorded the current token lifecycle boundary and a provider staging acceptance sequence. The verifier checks expiry and token scopes per request, but self-contained tokens are not immediately revoked when provider assignments change; end-to-end key rotation and revocation checks remain open until a provider is selected.
 - **2026-10-08:** Drafted the interim classification, audit access, retention, and deletion policy in `DATA_GOVERNANCE.md` and linked it from security and deployment guidance. The exact retention schedule and accountable privacy/legal decision-maker are still organization decisions, and no automated expiry exists; the checklist remains open and real personal data must stay out of the pilot.
+- **2026-10-08:** Set Node.js 24.21.0/npm 11.19.0 as the local baseline and Node.js 22.23.3/npm 10.9.9 as the compatibility lane; cPanel availability still requires confirmation against the actual hosting account. Recorded the locked SDK's legacy protocol versions, the unsupported 2026 protocol era, and current client verification limits. Added GitHub Actions CI for Node 22/24 install, build, tests, and high-severity dependency audit, with actions pinned to immutable commit SHAs. Added weekly Dependabot updates for npm and workflow actions and a scheduled CI dependency audit. The workflow will provide its first run result after push; no local tests were run during this work.

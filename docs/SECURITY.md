@@ -11,7 +11,7 @@
 
 Business requests require an OIDC/JWT bearer token. MCP1 checks the configured issuer, audience, expiry, signature through the configured JWKS endpoint, and an explicit scope on each tool call. Configure an identity provider to mint narrow audience-bound tokens and map user roles to MCP scopes. Never accept a user ID or role passed in tool arguments as identity.
 
-The provider and business MCP client are not yet selected. The recommended staff flow is OAuth Authorization Code with PKCE through the organization's existing workforce OIDC provider; use client credentials only for named unattended automation. MCP1 currently validates provisioned bearer tokens and does not yet provide OAuth authorization discovery. See [Business identity and client authentication](IDENTITY.md) for rollout requirements and this limitation.
+The provider and business MCP client are not yet selected. The recommended staff flow is OAuth Authorization Code with PKCE through the organization's workforce OIDC provider; use client credentials only for named unattended automation. MCP1 validates provisioned bearer tokens and exposes OAuth Protected Resource Metadata only when explicitly enabled; it does not provide login, consent, client registration, or token issuance. See [Business identity and client authentication](IDENTITY.md) for rollout requirements and this boundary.
 
 Current business scopes:
 

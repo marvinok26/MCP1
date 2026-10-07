@@ -2,7 +2,7 @@
 
 ## Local personal server
 
-Install Node.js 22+, install dependencies, and configure project paths in `.env` if they differ from the defaults. Connect the intended MCP client to run `npm run start:personal` from the repository root. Keep stdout reserved for MCP messages; diagnostics go to stderr.
+Install the repository-pinned Node.js 24.21.0 from `.nvmrc` for local development. Node.js 24 LTS with its bundled npm 11.19.0 is the recommended pairing; Node.js 22.23.3 with npm 10.9.9 is the compatibility lane. Use a current security patch in either supported major. Do not install npm 12 on Node 22.22.0: npm 12 requires Node `^22.22.2 || ^24.15.0 || >=26.0.0`. Configure project paths in `.env` if they differ from the defaults. Connect the intended MCP client to run `npm run start:personal` from the repository root. Keep stdout reserved for MCP messages; diagnostics go to stderr. See [MCP_CLIENT_MATRIX.md](MCP_CLIENT_MATRIX.md) for the locked SDK's protocol boundary and client validation status.
 
 ## Business service configuration
 
@@ -35,7 +35,7 @@ MCP1 does not currently expire audit records automatically. Keep the business pi
 
 The hosting provider and plan must enable a persistent Node application and supply the required runtime. Confirm all of the following with the real account before production:
 
-1. The selected Node version supports the locked dependencies.
+1. The selected Node version and bundled npm match a supported pairing above and support the locked dependencies.
 2. Passenger/Web Apps passes requests to the running process and supplies its runtime port.
 3. The `/mcp` route supports the POST request/response behavior required by the target MCP client. Verify streaming behavior too if that client needs it.
 4. HTTPS terminates correctly and the configured host reaches the app.
