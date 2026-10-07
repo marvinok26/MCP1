@@ -24,12 +24,15 @@ Recommended settings:
 - `BUSINESS_ALLOWED_ORIGINS` for any browser-based MCP client origins.
 - `BUSINESS_TRUST_PROXY=true` only when the trusted local reverse proxy sanitizes and sets `X-Forwarded-For`; this allows per-IP limits to use the real client address.
 - `BUSINESS_RATE_LIMIT_PER_MINUTE` with a value appropriate to the client population.
+- `BUSINESS_MAX_CONCURRENT_HEALTH_CHECKS` between 1 and 100; defaults to 20 per process.
 - `AUDIT_LOG_PATH` on a private persistent volume.
 - Per-system `SYSTEM_<KEY>_HEALTH_URL` and optional `SYSTEM_<KEY>_HEALTH_TOKEN` values.
 
-Start with `npm run start:business`. The endpoint is `/mcp`; `/healthz` is a minimal process liveness endpoint and contains no dependency information.
+Start with `npm run start:business`. The endpoint is `/mcp`; `/healthz` is process liveness and `/readyz` reports whether the listener is accepting work. Readiness does not probe downstream systems. On SIGTERM/SIGINT the service stops accepting connections, drains active requests for up to 10 seconds, and then closes remaining connections. Health-check calls are bounded per process and a system circuit opens after five failures for 30 seconds. These limits are process-local and do not replace shared controls before multi-worker deployment.
 
 MCP1 does not currently expire audit records automatically. Keep the business pilot synthetic or non-personal until the organization approves retention periods and deletion authority and the deployment has a tested retention process. See [DATA_GOVERNANCE.md](DATA_GOVERNANCE.md).
+
+See [OPERATIONS_RUNBOOK.md](OPERATIONS_RUNBOOK.md) for deployment, rollback, rotation, recovery, and incident-response procedures. Complete the host-specific values and rehearse them in staging before production.
 
 ## cPanel pilot checklist
 

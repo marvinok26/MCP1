@@ -37,7 +37,7 @@ Application record tools must additionally call application APIs using a delegat
 - Health endpoint URLs are operator configuration, require HTTPS, reject embedded credentials and fragments, and refuse redirects.
 - Personal paths are resolved through `realpath`, checked against the configured project root, and filtered for sensitive/generated paths.
 - External commands use `execFile` with fixed executable names and argument arrays. User text is never evaluated by a shell.
-- The HTTP service enforces configured Host names, optional browser Origin allowlisting, no-store responses, and per-process global, per-IP, and per-user rate limits.
+- The HTTP service enforces configured Host names, optional browser Origin allowlisting, no-store responses, and per-process global, per-IP, and per-user rate limits. Downstream health calls have a bounded concurrency gate and per-system circuit breaker.
 - Reverse-proxy IP forwarding is disabled by default. Enable trust only for the documented local proxy case where forwarded client addresses are overwritten by that proxy.
 
 ## Audit and privacy

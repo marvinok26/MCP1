@@ -22,6 +22,7 @@ export function createBusinessApp(authenticate: (header: string | undefined) => 
   const userLimit = Number(process.env.BUSINESS_USER_RATE_LIMIT_PER_MINUTE ?? 60);
   const globalLimit = Number(process.env.BUSINESS_GLOBAL_RATE_LIMIT_PER_MINUTE ?? 300);
   const windows = new Map<string, { start: number; count: number }>();
+  app.locals.mcpReady = true;
 
   app.disable('x-powered-by');
   if (process.env.BUSINESS_TRUST_PROXY === 'true') app.set('trust proxy', 'loopback');
@@ -66,6 +67,9 @@ export function createBusinessApp(authenticate: (header: string | undefined) => 
   }
 
   app.get('/healthz', (_req, res) => res.json({ status: 'ok' }));
+  app.get('/readyz', (_req, res) => app.locals.mcpReady
+    ? res.json({ status: 'ready' })
+    : res.status(503).json({ status: 'not_ready' }));
   app.get('/.well-known/oauth-protected-resource', (_req, res) => {
     if (!resourceUrl || !issuerUrl) return res.status(404).json({ error: 'Not found' });
     return res.json({
@@ -75,7 +79,9 @@ export function createBusinessApp(authenticate: (header: string | undefined) => 
       scopes_supported: ['mcp:systems:list', ...['ulterpos', 'tranquil', 'devspark', 'social-apps', 'renegade'].map((system) => `system:${system}:health:read`)],
     });
   });
-  app.all('/mcp', rateLimit, async (req, res) => {
+  app.all('/mcp', (req, res, next) => app.locals.mcpReady
+    ? next()
+    : res.status(503).json({ error: 'Service is shutting down' }), rateLimit, async (req, res) => {
     let identity: BusinessIdentity;
     try {
       identity = await authenticate(req.header('authorization'));

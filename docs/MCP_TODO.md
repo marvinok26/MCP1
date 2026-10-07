@@ -129,17 +129,30 @@ These changes belong in the respective application repositories. No record-level
 - [ ] Move JSONL audit output to a durable, access-controlled, append-only sink with retention/rotation and alerting.
 - [ ] Add dashboards for request volume, tool latency, downstream failures, rate limiting, and auth denials without logging business payloads.
 - [x] Add a weekly dependency update cadence for npm packages and GitHub Actions, plus a scheduled weekly dependency audit in CI; repository security-update settings still need to be enabled by an owner.
-- [ ] Add graceful shutdown, readiness checks, downstream circuit breaking, and bounded concurrency.
-- [ ] Add deployment rollback, secret rotation, backup/recovery, and incident response runbooks.
+- [x] Add graceful shutdown, listener readiness, per-process bounded health-check concurrency, and per-system downstream circuit breaking; shared multi-worker controls remain a scaling task.
+- [x] Add host-neutral deployment rollback, secret rotation, backup/recovery, and incident response procedures in `OPERATIONS_RUNBOOK.md`; fill host-specific contacts, recovery objectives, and rehearse in staging before production.
 - [ ] Reassess cPanel when usage, availability, worker count, network isolation, or audit retention outgrows shared hosting.
-- [ ] Review tool grants and app integrations periodically; remove unused scopes and credentials.
-- [ ] Maintain a new-app onboarding checklist and require a named owner, data classification, auth model, tool catalogue, and exit criteria.
+- [x] Document a quarterly review procedure for tool grants and integrations, including removal of unused scopes and credentials; live reviews begin when grants are provisioned.
+- [x] Add a new-application onboarding checklist requiring an owner, data classification, identity model, tool catalogue, test gates, and decommission criteria in `NEW_APP_ONBOARDING.md`.
 
-## Current next actions
+## Awaiting owner decisions and external prerequisites
 
-1. When ready, select an identity provider and shortlist the required business MCP clients, then validate their OAuth flows against MCP1's authorization discovery implementation.
-2. Verify the cPanel plan with a non-production Streamable HTTP pilot.
-3. Select one app and implement its identity/API bridge before exposing business records.
+- Select the workforce identity provider; Auth0 remains a provisional candidate only. Confirm its issuer, staff lifecycle, token/revocation requirements, and support for delegated actor tokens.
+- Name the supported remote and personal MCP clients and the first low-risk business workflow; OAuth, client prompts, resource support, and app API work depend on those selections.
+- Provide the actual cPanel provider/plan and staging access, or select another hosting target, so the persistent Node runtime, proxy behavior, limits, and recovery path can be exercised.
+- Name the organization privacy/legal approver and approve numeric retention periods, deletion authority, legal holds, and backup expiry before real personal data is used.
+- Enable repository Dependabot security updates/alerts in GitHub settings; workflow and weekly update configuration are in the repository, but account settings are controlled outside Git.
+- Approve the confirmation policy before adding any personal file-write or command-execution tool. No such tool is exposed today.
+- Approve the business roles, thresholds, and separation-of-duties rules for write approvals before any app enables a mutating or externally visible MCP action.
+- Select the first application/API owner and authorize changes in that application's repository; MCP1 has no app-owned identity bridge or production record endpoints yet.
+
+## Automated work that remains gated by these decisions
+
+- OAuth provider lifecycle/revocation verification, named-client interoperability, and resource-template client exercise.
+- Non-production cPanel deployment and verification of the selected proxy, runtime, logs, and capacity.
+- Business API bridges and record tools in each owning application, followed by typed MCP adapters and synthetic-data permission tests.
+- Final numeric retention implementation and centralized durable audit storage after retention requirements and operational ownership are approved.
+- Browser automation and client-specific connection profiles after target clients, URLs, and synthetic staging data are named.
 
 ## Progress log
 
@@ -160,3 +173,7 @@ These changes belong in the respective application repositories. No record-level
 - **2026-10-08:** Set Node.js 24.21.0/npm 11.19.0 as the local baseline and Node.js 22.23.3/npm 10.9.9 as the compatibility lane; cPanel availability still requires confirmation against the actual hosting account. Recorded the locked SDK's legacy protocol versions, the unsupported 2026 protocol era, and current client verification limits. Added GitHub Actions CI for Node 22/24 install, build, tests, and high-severity dependency audit, with actions pinned to immutable commit SHAs. Added weekly Dependabot updates for npm and workflow actions and a scheduled CI dependency audit. The workflow will provide its first run result after push; no local tests were run during this work.
 - **2026-10-08:** Added the personal `project-documentation` resource template. It lists only bounded documentation files, uses project-relative URIs, skips hidden paths and unavailable roots, and revalidates every read against the existing root and sensitive-path rules. Named-client resource interoperability remains pending.
 - **2026-10-08:** Improved personal tool errors for missing project paths, missing ripgrep, and non-Git project directories. Documented the existing environment-based root overrides. No tests were run locally; CI will build and exercise the existing suite on the next push.
+- **2026-10-08:** Added `/readyz`, graceful SIGTERM/SIGINT draining with a 10-second force-close deadline, a configurable per-process cap for concurrent health checks, and a per-system circuit breaker that opens after five downstream failures and permits one recovery probe after 30 seconds. These are single-process safeguards; shared rate limiting and concurrency control are still required before multi-worker deployment.
+- **2026-10-08:** Added the new-application onboarding template, documented quarterly access/integration review, and added host-neutral deployment, rollback, secret-rotation, recovery, and incident procedures. Environment-specific approvals and staging rehearsal remain outstanding.
+- **2026-10-08:** The first CI run failed because `personal-stdio.test.ts` assumed local project directories existed on hosted runners. Reworked it to create temporary fixtures for all five projects and verify documentation resource listing/read plus secret and hidden-path exclusion. `npm run build` passed and all 8 tests passed locally; the corrected workflow result is pending the next push.
+- **2026-10-08:** Added a host-neutral runbook for deployment/rollback, secret and signing-key rotation, incident response, backup/recovery, and monitoring. Host contacts, recovery objectives, privacy decisions, and staging rehearsal remain deployment prerequisites.

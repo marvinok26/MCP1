@@ -42,6 +42,10 @@ An effective call requires all three checks:
 - Remove mappings when a role or app permission is retired. Unrecognized roles, permissions, missing actor links, and unavailable app checks deny access.
 - Log the verified actor, requested tool, outcome, and correlation ID in MCP1; keep the app's own audit event as the record of business authorization and activity.
 
+## Periodic grant review
+
+Review each application's owner, active identity links, provider groups, MCP scopes, app permissions, and integration credentials at least quarterly and after an owner, identity, or security change. Confirm each grant still supports a named use case, remove unused grants and credentials, and record the reviewer, date, evidence, and follow-up actions. Future applications must enter this review through [NEW_APP_ONBOARDING.md](NEW_APP_ONBOARDING.md). No provider-side grants exist in the current implementation, so this procedure becomes operational when the identity provider and first business client are selected.
+
 ## Source locations reviewed
 
 - UlterPOS: `database/seeders/PermissionSeeder.php`, `database/seeders/RolePermissionSeeder.php`, and permission-protected route groups.

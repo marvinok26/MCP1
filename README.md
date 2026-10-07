@@ -4,8 +4,8 @@ MCP1 is a modular Model Context Protocol platform for local development work and
 
 ## Operating modes
 
-- **Personal:** a local stdio server for project discovery, code/document search, safe file reading, and Git review.
-- **Business:** a remote Streamable HTTP server with OIDC/JWT bearer-token validation, per-tool scopes, redacted audit events, rate limits, and configured system health checks. OAuth sign-in and discovery are not implemented yet.
+- **Personal:** a local stdio server for project discovery, code/document search, bounded documentation resources, safe file reading, and Git review.
+- **Business:** a remote Streamable HTTP server with OIDC/JWT bearer-token validation, per-tool scopes, redacted audit events, process limits, readiness, graceful shutdown, and configured system health checks. Protected-resource OAuth metadata is opt-in; sign-in and token issuance are not implemented.
 
 The modes share project metadata and integration contracts. They do not share credentials or execution privileges. Business tools call application-owned APIs; they do not connect directly to production databases.
 
@@ -23,7 +23,7 @@ Paths can be overridden in local configuration. MCP1 never reads `.env` files an
 
 ## Quick start
 
-Requirements: Node.js 22 or newer and npm.
+Requirements: Node.js 24.21.0 and its bundled npm 11.19.0 for local development. Node.js 22.23.3/npm 10.9.9 is the compatibility lane. See [supported runtimes](docs/DEPLOYMENT.md).
 
 ```sh
 npm install
@@ -58,6 +58,10 @@ npm run start:business
 - [Security model](docs/SECURITY.md)
 - [Business identity and client authentication](docs/IDENTITY.md)
 - [Deployment and operations](docs/DEPLOYMENT.md)
+- [MCP client and protocol compatibility](docs/MCP_CLIENT_MATRIX.md)
+- [Data governance](docs/DATA_GOVERNANCE.md)
+- [Operations runbook](docs/OPERATIONS_RUNBOOK.md)
+- [New application onboarding](docs/NEW_APP_ONBOARDING.md)
 - [Adding an integration](docs/ADDING_INTEGRATIONS.md)
 - [Application integration readiness](docs/INTEGRATION_READINESS.md)
 - [Business role-to-scope mapping](docs/ROLE_SCOPE_MAPPING.md)

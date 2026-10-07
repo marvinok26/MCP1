@@ -27,6 +27,8 @@ The stdio server exposes one `project-documentation` resource template with URIs
 
 The `system` input accepts one of the five project keys. A health URL and optional bearer token are configured per system. Redirects are refused, and only HTTPS URLs are accepted.
 
+Downstream health checks are capped per process (20 concurrent by default, configurable from 1 to 100). Five consecutive failures open that system's circuit for 30 seconds; after the delay a single health check may probe recovery. The tool reports only system key, reachability, and HTTP status.
+
 ## Adding a business tool
 
 Every new tool needs:
