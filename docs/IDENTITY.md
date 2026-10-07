@@ -47,7 +47,9 @@ No provider, API actor-token verifier, identity link, or record tool is implemen
 
 ## Current implementation boundary
 
-MCP1 currently verifies bearer JWTs but does not implement OAuth authorization, Protected Resource Metadata, or authorization-server discovery. Therefore the implementation is suitable for the signed-token integration tests and controlled pilots where tokens are provisioned out of band; it is not yet a plug-and-play OAuth connection for general remote MCP clients. Before a staff rollout, confirm the target clients, implement and verify the MCP authorization discovery flow they require, and validate issuer/audience/scope behavior with the real provider.
+MCP1 verifies bearer JWTs and now has opt-in OAuth Protected Resource Metadata at `/.well-known/oauth-protected-resource`. Enable it with `BUSINESS_OAUTH_DISCOVERY_ENABLED=true` and configure the canonical HTTPS `BUSINESS_RESOURCE_URL`; the issuer comes from `BUSINESS_ISSUER_URL`. Unauthorized MCP requests then include the canonical metadata URL in `WWW-Authenticate`. Metadata is static configuration and never reflects an incoming Host header. Discovery remains disabled by default because no provider or client has been selected.
+
+This makes the resource discoverable; it does not implement OAuth authorization, interactive login, consent, client registration, or token issuance. The selected provider and actual remote clients must still be validated for Authorization Code with PKCE, issuer/audience/scope behavior, and token lifecycle before staff rollout. Until then, the existing provisioned-bearer pilot boundary applies.
 
 The deployed MCP TypeScript SDK line and protocol/client compatibility are tracked separately in [MCP_TODO.md](MCP_TODO.md). Provider-specific lifecycle and revocation behavior must be added here after the provider is selected.
 

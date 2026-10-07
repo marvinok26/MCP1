@@ -12,8 +12,10 @@ Required settings:
 - `BUSINESS_AUDIENCE`: token audience assigned to MCP1.
 - `BUSINESS_JWKS_URL`: trusted OIDC signing-key endpoint.
 - `BUSINESS_ALLOWED_HOSTS`: comma-separated hostnames accepted by the service.
+- `BUSINESS_OAUTH_DISCOVERY_ENABLED=false` by default. Set to `true` only after choosing and configuring the identity provider and confirming target-client compatibility.
+- `BUSINESS_RESOURCE_URL`: canonical public MCP URL (for example `https://mcp.example.com/mcp`); required when OAuth discovery is enabled. It must use HTTPS and a hostname in `BUSINESS_ALLOWED_HOSTS`.
 
-The identity provider and remote MCP clients are still awaiting organization confirmation. Do not treat the current bearer-token verifier as a complete interactive OAuth deployment: authorization discovery and provider/client flow validation are rollout prerequisites. See [IDENTITY.md](IDENTITY.md).
+When enabled, `GET /.well-known/oauth-protected-resource` returns OAuth Protected Resource Metadata and invalid bearer requests to `/mcp` include its canonical URL in `WWW-Authenticate`. Both URLs come from explicit configuration; request Host headers never determine discovery metadata. This publishes the selected issuer as the authorization server, but does not implement OAuth login, consent, client registration, or token issuance. Keep discovery disabled until the organization selects an identity provider and validates the target clients. See [IDENTITY.md](IDENTITY.md).
 
 Recommended settings:
 
