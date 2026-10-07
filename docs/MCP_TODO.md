@@ -34,7 +34,7 @@ This is the working delivery checklist for personal and business MCP functionali
 - [ ] Confirm and document a supported Node/npm pairing for local and cPanel runtimes; npm 12 warns that this environment's Node 22.22.0 is below its supported patch range, although install and build completed.
 - [x] Add automated tests for path traversal, secret exclusions, JWT issuer/audience/signature/expiry, scopes, CORS/Host checks, per-IP/user/global limits, audit redaction, and Streamable HTTP MCP transport handling; 3 files and 6 tests pass.
 - [x] Exercise personal stdio tools through the MCP SDK client against harmless README files in all five configured project roots; confirm `.env` access is refused.
-- [ ] Exercise business Streamable HTTP initialization and tool calls with valid, expired, wrong-audience, and insufficient-scope tokens.
+- [x] Exercise business Streamable HTTP initialization and tool calls with valid, expired, wrong-audience, and insufficient-scope tokens; the integration test serves a local JWKS, rejects expired/wrong-audience initialization with 401, completes a valid MCP session, and denies the health tool without its scope.
 - [ ] Review current MCP SDK/spec compatibility and record the supported client/protocol matrix.
 - [ ] Add a CI workflow for install, typecheck, unit/security tests, dependency audit, and build.
 
@@ -136,10 +136,9 @@ These changes belong in the respective application repositories. No record-level
 
 ## Current next actions
 
-1. Exercise business Streamable HTTP end to end with real signed tokens and valid, expired, wrong-audience, and insufficient-scope cases.
-2. Confirm the chosen OIDC provider and business client authentication behavior.
-3. Verify the cPanel plan with a non-production Streamable HTTP pilot.
-4. Select one app and implement its identity/API bridge before exposing business records.
+1. Confirm the chosen OIDC provider and business client authentication behavior.
+2. Verify the cPanel plan with a non-production Streamable HTTP pilot.
+3. Select one app and implement its identity/API bridge before exposing business records.
 
 ## Progress log
 
@@ -147,3 +146,4 @@ These changes belong in the respective application repositories. No record-level
 - **2026-10-08:** Installed dependencies and passed `npm run build`; fixed the project-list export and host typing, and kept strict optional-property checking with a narrow SDK transport type bridge. npm emitted a Node/npm compatibility warning; no runtime or protocol tests were run.
 - **2026-10-08:** Added Vitest security and protocol coverage; `npm run build` passed and all 6 tests across 3 files passed, including a live Streamable HTTP MCP client exchange. The Node built-in test runner in this runtime was unusable, so Vitest is the test runner. Personal stdio client exercise remains pending.
 - **2026-10-08:** Exercised personal stdio with an MCP client against README files in all five configured project roots; all reads succeeded and `.env` access was refused. `npm run build` passed and the full suite passed with 7 tests across 4 files.
+- **2026-10-08:** Exercised business Streamable HTTP with real RS256 tokens and a local JWKS endpoint. Expired and wrong-audience tokens were refused during initialization; a valid signed token initialized and listed tools, while a call lacking its tool scope was denied. `npm run build` passed and the full suite passed with 8 tests across 4 files. JWKS clients now refresh when the configured JWKS URL changes, which keeps configuration changes and isolated test issuers from reusing a stale key source.

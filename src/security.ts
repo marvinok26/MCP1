@@ -4,9 +4,14 @@ import { requiredEnv } from './config.js';
 export type BusinessIdentity = { subject: string; scopes: Set<string> };
 
 let jwks: ReturnType<typeof createRemoteJWKSet> | undefined;
+let jwksUrl: string | undefined;
 
 function keySet() {
-  if (!jwks) jwks = createRemoteJWKSet(new URL(requiredEnv('BUSINESS_JWKS_URL')));
+  const configuredUrl = requiredEnv('BUSINESS_JWKS_URL');
+  if (!jwks || jwksUrl !== configuredUrl) {
+    jwks = createRemoteJWKSet(new URL(configuredUrl));
+    jwksUrl = configuredUrl;
+  }
   return jwks;
 }
 

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
-import { request as httpRequest } from 'node:http';
+import { createServer, request as httpRequest } from 'node:http';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -8,6 +8,7 @@ import { test } from 'vitest';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
+import { exportJWK, generateKeyPair, SignJWT } from 'jose';
 import { createBusinessApp } from './business.js';
 import type { BusinessIdentity } from './security.js';
 
@@ -125,6 +126,92 @@ test('Streamable HTTP exposes scoped tools and writes redacted audit records', a
     restore.reverse().forEach((fn) => fn());
     previousAudit();
     await rm(temp, { recursive: true, force: true });
+  }
+});
+
+test('business Streamable HTTP enforces signed-token claims and tool scopes end to end', async () => {
+  const { privateKey, publicKey } = await generateKeyPair('RS256');
+  const publicJwk = { ...await exportJWK(publicKey), kid: 'http-test-key', use: 'sig', alg: 'RS256' };
+  const jwksServer = createServer((_req, res) => {
+    res.setHeader('content-type', 'application/json');
+    res.setHeader('cache-control', 'public, max-age=60');
+    res.end(JSON.stringify({ keys: [publicJwk] }));
+  });
+  jwksServer.listen(0, '127.0.0.1');
+  await once(jwksServer, 'listening');
+  const jwksAddress = jwksServer.address();
+  assert.ok(jwksAddress && typeof jwksAddress !== 'string');
+
+  const restore = [
+    setEnv('BUSINESS_ALLOWED_HOSTS', '127.0.0.1'),
+    setEnv('BUSINESS_ALLOWED_ORIGINS', undefined),
+    setEnv('BUSINESS_ISSUER_URL', 'https://identity.example.test/'),
+    setEnv('BUSINESS_AUDIENCE', 'https://mcp.example.test'),
+    setEnv('BUSINESS_JWKS_URL', `http://127.0.0.1:${jwksAddress.port}/jwks`),
+    setEnv('BUSINESS_RATE_LIMIT_PER_MINUTE', '40'),
+    setEnv('BUSINESS_USER_RATE_LIMIT_PER_MINUTE', '40'),
+    setEnv('BUSINESS_GLOBAL_RATE_LIMIT_PER_MINUTE', '80'),
+    setEnv('SYSTEM_ULTERPOS_HEALTH_URL', undefined),
+  ];
+  const app = createBusinessApp();
+  const listener = app.listen(0, '127.0.0.1');
+  await once(listener, 'listening');
+  const address = listener.address();
+  assert.ok(address && typeof address !== 'string');
+  const endpoint = new URL(`http://127.0.0.1:${address.port}/mcp`);
+
+  const sign = async (options: { audience?: string; expiresAt?: number; scope?: string } = {}) => {
+    const now = Math.floor(Date.now() / 1000);
+    return new SignJWT({ scope: options.scope ?? 'mcp:systems:list' })
+      .setProtectedHeader({ alg: 'RS256', kid: 'http-test-key' })
+      .setSubject('http-staff-9')
+      .setIssuer('https://identity.example.test/')
+      .setAudience(options.audience ?? 'https://mcp.example.test')
+      .setIssuedAt(now)
+      .setExpirationTime(options.expiresAt ?? now + 60)
+      .sign(privateKey);
+  };
+
+  async function initialize(token: string): Promise<Response> {
+    return fetch(endpoint, {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json', accept: 'application/json, text/event-stream' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: {
+        protocolVersion: '2025-03-26', capabilities: {}, clientInfo: { name: 'mcp1-auth-test', version: '0.1.0' },
+      } }),
+    });
+  }
+
+  try {
+    const expired = await initialize(await sign({ expiresAt: Math.floor(Date.now() / 1000) - 1 }));
+    assert.equal(expired.status, 401);
+    await expired.body?.cancel();
+    const wrongAudience = await initialize(await sign({ audience: 'https://other.example.test' }));
+    assert.equal(wrongAudience.status, 401);
+    await wrongAudience.body?.cancel();
+
+    const transport = new StreamableHTTPClientTransport(endpoint, {
+      requestInit: { headers: { authorization: `Bearer ${await sign()}` } },
+    });
+    const client = new Client({ name: 'mcp1-e2e-auth', version: '0.1.0' });
+    try {
+      await client.connect(transport as unknown as Transport);
+      const { tools } = await client.listTools();
+      assert.deepEqual(tools.map((tool) => tool.name).sort(), ['business_system_health', 'business_systems_list']);
+      const systems = await client.callTool({ name: 'business_systems_list', arguments: {} });
+      assert.equal(systems.isError, undefined);
+      assert.equal(((systems.content as Array<{ text?: string }>)[0])?.text, '[]');
+      const denied = await client.callTool({ name: 'business_system_health', arguments: { system: 'ulterpos' } });
+      assert.equal(denied.isError, true);
+    } finally {
+      await client.close();
+    }
+  } finally {
+    listener.close();
+    await once(listener, 'close');
+    jwksServer.close();
+    await once(jwksServer, 'close');
+    restore.reverse().forEach((fn) => fn());
   }
 });
 
