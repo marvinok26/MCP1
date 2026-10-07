@@ -29,6 +29,8 @@ Recommended settings:
 
 Start with `npm run start:business`. The endpoint is `/mcp`; `/healthz` is a minimal process liveness endpoint and contains no dependency information.
 
+MCP1 does not currently expire audit records automatically. Keep the business pilot synthetic or non-personal until the organization approves retention periods and deletion authority and the deployment has a tested retention process. See [DATA_GOVERNANCE.md](DATA_GOVERNANCE.md).
+
 ## cPanel pilot checklist
 
 The hosting provider and plan must enable a persistent Node application and supply the required runtime. Confirm all of the following with the real account before production:

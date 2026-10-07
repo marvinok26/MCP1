@@ -24,7 +24,7 @@ Current business scopes:
 
 The app-specific role-to-scope mapping policy and known gaps are in [ROLE_SCOPE_MAPPING.md](ROLE_SCOPE_MAPPING.md). Health scopes are explicitly assigned to approved operations users; app roles do not grant health or record access by name alone.
 
-The current authorization audit and future per-operation release gates are documented in [AUTHORIZATION_REVIEW.md](AUTHORIZATION_REVIEW.md). No business record tool is enabled; app-side policies must be verified for every future adapter operation.
+The current authorization audit and future per-operation release gates are documented in [AUTHORIZATION_REVIEW.md](AUTHORIZATION_REVIEW.md). No business record tool is enabled; app-side policies must be verified for every future adapter operation. Data categories, audit access, and pending retention/deletion decisions are in [DATA_GOVERNANCE.md](DATA_GOVERNANCE.md).
 
 The preview, human approval, and execute requirements for any future write or external action are in [WRITE_APPROVALS.md](WRITE_APPROVALS.md). Client prompts and tool annotations supplement, but never replace, app-side approval records and authorization.
 
@@ -42,7 +42,7 @@ Application record tools must additionally call application APIs using a delegat
 
 ## Audit and privacy
 
-Business tool calls write JSONL audit events containing actor subject, tool name, outcome, timestamp, and optional correlation identifier. Tool arguments, bearer tokens, endpoint URLs, and business records are not written to that audit file. The configured path should be on a private, access-controlled volume with rotation and retention policy.
+Business tool calls write JSONL audit events containing actor subject, tool name, outcome, timestamp, and request identifier. Tool arguments, bearer tokens, endpoint URLs, and business records are not written to that audit file. The configured path should be on a private, access-controlled volume with rotation and retention policy. MCP1 currently enforces no retention period; see [DATA_GOVERNANCE.md](DATA_GOVERNANCE.md) before any production use with personal data.
 
 The starter rate limiter and audit file are process-local. Use a shared rate-limit store and centralized append-only audit sink before running multiple workers or relying on the service for regulated workflows. Make audit-write failure visible and fail closed for any future mutating tool.
 
