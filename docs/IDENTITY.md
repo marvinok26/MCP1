@@ -53,6 +53,14 @@ This makes the resource discoverable; it does not implement OAuth authorization,
 
 The deployed MCP TypeScript SDK line and protocol/client compatibility are tracked separately in [MCP_TODO.md](MCP_TODO.md). Provider-specific lifecycle and revocation behavior must be added here after the provider is selected.
 
+## Token lifecycle behavior and rollout gate
+
+The current verifier checks the JWT signature, exact configured issuer and audience, expiration, subject, and scopes on every MCP request. It accepts RS256 and ES256 keys from the configured JWKS endpoint. The JWKS client can refresh keys as keys rotate, but the real provider's overlapping-key publication and cache behavior have not been exercised.
+
+Access tokens are self-contained. Removing a user's provider assignment or a scope does not change a token already issued; that token can continue to work until its expiry. MCP1 has no token introspection, revocation list, or provider event hook today. Immediate deactivation/revocation therefore cannot be promised. Keep access-token lifetimes short and make the provider/client selection gate include a measured revocation delay. If the business requires immediate revocation, add and operate an online revocation/introspection mechanism before staff access is enabled.
+
+After a provider is selected, verify in a staging tenant: publish an overlapping signing key and rotate to it; retire the old key; remove one user's MCP assignment; remove one granted scope; deactivate the user; revoke an issued token; and record how long each already-issued token remains accepted. Repeat with each supported client and document the observed cache and refresh behavior. Do not treat the current JWT unit coverage as provider lifecycle validation.
+
 ## Protocol references
 
 - [MCP authorization specification, 2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization): MCP servers are OAuth resource servers; Protected Resource Metadata is required for authorization-server discovery; clients use OAuth Authorization Code with PKCE.
