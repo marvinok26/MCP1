@@ -62,3 +62,5 @@ See [Business identity and client authentication](IDENTITY.md) for the selected 
 Each entry remains pending until the application API and identity bridge are implemented and reviewed in that application's repository.
 
 The cross-system role-to-scope policy and current role-model gaps are documented in [ROLE_SCOPE_MAPPING.md](ROLE_SCOPE_MAPPING.md). It does not issue grants; all record scopes remain unavailable until the app API and verified identity bridge are ready.
+
+The current tool-by-tool authorization findings and mandatory adapter release checks are documented in [AUTHORIZATION_REVIEW.md](AUTHORIZATION_REVIEW.md). No current tool accesses business records; app-side enforcement must be proven with synthetic-data tests before each future record tool ships.

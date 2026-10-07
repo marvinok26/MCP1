@@ -24,6 +24,8 @@ Current business scopes:
 
 The app-specific role-to-scope mapping policy and known gaps are in [ROLE_SCOPE_MAPPING.md](ROLE_SCOPE_MAPPING.md). Health scopes are explicitly assigned to approved operations users; app roles do not grant health or record access by name alone.
 
+The current authorization audit and future per-operation release gates are documented in [AUTHORIZATION_REVIEW.md](AUTHORIZATION_REVIEW.md). No business record tool is enabled; app-side policies must be verified for every future adapter operation.
+
 Application record tools must additionally call application APIs using a delegated user identity or an equivalent verified authorization context. A shared service credential must not silently elevate a caller.
 
 ## Input and network safety
