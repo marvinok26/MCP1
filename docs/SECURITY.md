@@ -26,6 +26,8 @@ The app-specific role-to-scope mapping policy and known gaps are in [ROLE_SCOPE_
 
 The current authorization audit and future per-operation release gates are documented in [AUTHORIZATION_REVIEW.md](AUTHORIZATION_REVIEW.md). No business record tool is enabled; app-side policies must be verified for every future adapter operation.
 
+The preview, human approval, and execute requirements for any future write or external action are in [WRITE_APPROVALS.md](WRITE_APPROVALS.md). Client prompts and tool annotations supplement, but never replace, app-side approval records and authorization.
+
 Application record tools must additionally call application APIs using a delegated user identity or an equivalent verified authorization context. A shared service credential must not silently elevate a caller.
 
 ## Input and network safety

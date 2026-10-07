@@ -62,6 +62,7 @@ npm run start:business
 - [Application integration readiness](docs/INTEGRATION_READINESS.md)
 - [Business role-to-scope mapping](docs/ROLE_SCOPE_MAPPING.md)
 - [Business authorization review](docs/AUTHORIZATION_REVIEW.md)
+- [Write and external-action approval policy](docs/WRITE_APPROVALS.md)
 - [Decision record](docs/DECISIONS.md)
 
 ## Current limits

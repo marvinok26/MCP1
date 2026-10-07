@@ -31,7 +31,9 @@ Every new tool needs:
 4. An app-owned API endpoint that performs authorization, validation, scoping, and audit.
 5. Output minimization and field-level authorization.
 6. Audit metadata that excludes secrets and record payloads.
-7. Idempotency for state changes, with human approval for consequential operations.
+7. Idempotency for state changes and the app-owned preview/approval/execute flow in [WRITE_APPROVALS.md](WRITE_APPROVALS.md) for consequential operations.
 8. A documented failure contract and an integration verification plan.
 
 Never register a generic arbitrary URL, SQL, shell, or database query tool.
+
+Business writes and externally visible effects are disabled by default. MCP client confirmation and tool annotations are not substitutes for the owning application's approval record and authorization checks.
