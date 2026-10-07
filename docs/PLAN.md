@@ -26,6 +26,8 @@ Runs as an authenticated remote Streamable HTTP service. The first implementatio
 
 The local repository for Renegade is the Laravel application at `Tickets&Events/renegade/website/renegade`.
 
+See [Application integration readiness](INTEGRATION_READINESS.md) for the current route/auth review and the required identity bridge before adding record-level tools.
+
 ## Delivery phases
 
 1. **Foundation:** local stdio mode, remote HTTP mode, tool schemas, identity verification, scopes, audit events, limits, health checks, deployment guidance.

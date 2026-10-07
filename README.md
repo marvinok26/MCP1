@@ -56,6 +56,7 @@ npm run start:business
 - [Security model](docs/SECURITY.md)
 - [Deployment and operations](docs/DEPLOYMENT.md)
 - [Adding an integration](docs/ADDING_INTEGRATIONS.md)
+- [Application integration readiness](docs/INTEGRATION_READINESS.md)
 - [Decision record](docs/DECISIONS.md)
 
 ## Current limits
