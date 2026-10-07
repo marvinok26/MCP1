@@ -1,0 +1,28 @@
+{
+  "name": "ulter-net-mcp-platform",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev:personal": "tsx src/personal.ts",
+    "start:personal": "node dist/personal.js",
+    "start:business": "node dist/business.js",
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "jose": "^6.1.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^22.15.30",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}
