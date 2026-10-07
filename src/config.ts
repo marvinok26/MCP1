@@ -17,6 +17,10 @@ export const projects: ProjectConfig[] = projectDefinitions.map(([key, name, var
   root: path.resolve(process.env[variable] || defaultRoot),
 }));
 
+export function allProjects(): ProjectConfig[] {
+  return projects;
+}
+
 export function requiredEnv(name: string): string {
   const value = process.env[name]?.trim();
   if (!value) throw new Error(`Required environment variable ${name} is not set`);

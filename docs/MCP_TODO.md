@@ -30,7 +30,8 @@ This is the working delivery checklist for personal and business MCP functionali
 - [x] Add opt-in HTTPS health checks for configured integrations, refusing redirects and returning minimal status.
 - [x] Document setup, security, operations, tool catalogue, decisions, integration patterns, and application readiness.
 - [x] Create and commit the npm lockfile.
-- [ ] Run a dependency install/build in an approved environment and resolve all type/runtime errors.
+- [x] Install the locked dependencies and run the TypeScript build/typecheck; resolve the compiler errors found on 2026-10-08.
+- [ ] Confirm and document a supported Node/npm pairing for local and cPanel runtimes; npm 12 warns that this environment's Node 22.22.0 is below its supported patch range, although install and build completed.
 - [ ] Add automated tests for path traversal, secret exclusions, JWT issuer/audience/signature/expiry, scopes, CORS/Host checks, limits, audit redaction, and MCP transport handling.
 - [ ] Exercise personal stdio tools with an MCP client or Inspector against harmless files in all five configured projects.
 - [ ] Exercise business Streamable HTTP initialization and tool calls with valid, expired, wrong-audience, and insufficient-scope tokens.
@@ -135,7 +136,7 @@ These changes belong in the respective application repositories. No record-level
 
 ## Current next actions
 
-1. Run the foundation build/typecheck and establish automated security/protocol coverage.
+1. Add automated security/protocol coverage, then exercise both MCP transports with a client.
 2. Confirm the chosen OIDC provider and business client authentication behavior.
 3. Verify the cPanel plan with a non-production Streamable HTTP pilot.
 4. Select one app and implement its identity/API bridge before exposing business records.
@@ -143,3 +144,4 @@ These changes belong in the respective application repositories. No record-level
 ## Progress log
 
 - **2026-10-08:** Initial personal/business foundation, five project registry entries, security/deployment documentation, and route/auth readiness inventory committed and pushed. Current implementation commit: `332d0b8`.
+- **2026-10-08:** Installed dependencies and passed `npm run build`; fixed the project-list export and host typing, and kept strict optional-property checking with a narrow SDK transport type bridge. npm emitted a Node/npm compatibility warning; no runtime or protocol tests were run.

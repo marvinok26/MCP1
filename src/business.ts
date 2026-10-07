@@ -2,6 +2,7 @@ import express, { type Request, type Response, type NextFunction } from 'express
 import { randomUUID } from 'node:crypto';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 import { optionalEnv, requiredEnv } from './config.js';
 import { registerBusinessTools } from './business-tools.js';
 import { authenticateBearer, type BusinessIdentity } from './security.js';
@@ -17,7 +18,7 @@ const windows = new Map<string, { start: number; count: number }>();
 app.disable('x-powered-by');
 if (process.env.BUSINESS_TRUST_PROXY === 'true') app.set('trust proxy', 'loopback');
 app.use((req, res, next) => {
-  const host = (req.headers.host ?? '').toLowerCase().split(':')[0];
+  const host = (req.headers.host ?? '').toLowerCase().split(':')[0] ?? '';
   if (!hostAllowlist.has(host)) return res.status(421).json({ error: 'Unknown host' });
   const origin = req.headers.origin;
   if (origin && !originAllowlist.has(origin)) return res.status(403).json({ error: 'Origin not allowed' });
@@ -71,13 +72,14 @@ app.all('/mcp', rateLimit, async (req, res) => {
 
   const server = new McpServer({ name: 'ulter-net-business', version: '0.1.0' }, { maxToolInputElements: 100 });
   registerBusinessTools(server, identity, randomUUID());
-  const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
+  const transport = new StreamableHTTPServerTransport({ enableJsonResponse: true });
   res.on('finish', () => {
     void transport.close();
     void server.close();
   });
   try {
-    await server.connect(transport);
+    // The SDK transport getter exposes undefined for an optional callback; bridge its type here.
+    await server.connect(transport as unknown as Transport);
     await transport.handleRequest(req, res, req.body);
   } catch {
     if (!res.headersSent) res.status(500).json({ error: 'MCP request failed' });
