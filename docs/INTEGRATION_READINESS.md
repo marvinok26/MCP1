@@ -20,6 +20,10 @@ This inventory records the existing application API and authentication boundarie
 
 **MCP path:** add a narrow server-to-server authentication mechanism or a supported delegated session bridge in the UlterNet website. Preserve its admin authorization and audit behavior. Draft preparation can happen outside the publishing endpoint; publishing remains a separate confirmed action. Contact-message tools must avoid exposing full sender content unnecessarily.
 
+**Client-reach workflow findings (2026-10-08):** the website stores contact enquiries and newsletter subscriptions. The existing contact-message API is behind the web session, admin, and API-throttle middleware; it is not a service-token API. Its list/detail responses can include direct identifiers and enquiry content, so MCP1 must not call it using a shared admin credential or expose individual messages. The website launch checklist still lists lead-source tracking as future work. A source scan found no configured GA4, Search Console, or other analytics tag in tracked templates/assets; confirm production-side tag management separately before treating this as a complete inventory.
+
+The first safe marketing integration should return aggregate counts only (for example, enquiries by date, project type, and approved campaign-source categories). Before implementation, choose the traffic-data source and approve the collection, retention, and attribution approach. Do not return names, email addresses, phone numbers, message text, IP addresses, or user-agent strings in MCP marketing summaries. If actual traffic acquisition metrics are needed, connect an authorized analytics/search platform after confirming it is configured for this site; contact records alone cannot show impressions or visits.
+
 ## Social apps
 
 `routes/api.php` exposes WhatsApp instance routes with per-instance tokens in URL paths, plus SMS/Telegram/email v1 send routes using channel API tokens. The route comments describe sending as queued and impose queue/hourly caps.

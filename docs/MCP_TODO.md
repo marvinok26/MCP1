@@ -92,6 +92,8 @@ These changes belong in the respective application repositories. No record-level
 - [ ] Add read-only draft identifiers/status and draft preview endpoints with field minimization.
 - [ ] Add a separate publishing preview/approval workflow; do not make ordinary content preparation publishable by default.
 - [ ] Scope contact-message summaries and replies to authorized staff; minimize personal information in MCP results.
+- [ ] Choose and configure the website traffic/search analytics source and privacy-reviewed lead-source attribution before implementing client-reach reporting.
+- [ ] Add a narrowly authenticated, aggregate-only inquiry/conversion summary API; never return contact details or message content from this reporting tool.
 
 ### Social apps
 
