@@ -6,10 +6,12 @@ The lockfile resolves `@modelcontextprotocol/sdk` 1.32.1 from the declared v1 de
 
 | Connection | MCP1 mode | Wire behavior | Authentication | Client status |
 | --- | --- | --- | --- | --- |
-| Local developer client | stdio | Legacy initialize handshake; protocol versions listed above; exposes documentation resources | Local process access; tools and resources are limited to configured project roots | Tool path was exercised with the MCP SDK client against harmless project README files; `.env` access was refused. The new resource template still needs a client interoperability exercise. Named desktop clients are not selected. |
-| Remote business client | Streamable HTTP at `/mcp` | Legacy initialize handshake; stateless JSON responses | Bearer JWT validation; OAuth resource metadata is opt-in, and login/token issuance are not implemented | Local SDK integration exercised; actual products and OAuth flows remain unselected and unverified. |
+| VS Code / GitHub Copilot | stdio locally; Streamable HTTP remotely | Legacy initialize handshake; protocol versions listed above | Local process access; remote bearer JWT verification; OAuth login/token issuance not implemented | Local SDK integration exercised, but VS Code client interoperability is pending. Remote use is blocked on provider/OAuth setup and client testing. |
+| Claude Code | stdio locally; Streamable HTTP remotely | Legacy initialize handshake; protocol versions listed above | Local process access; remote OAuth supported by client but not yet implemented/configured in MCP1 | SDK stdio test passed; Claude Code client test is pending. Remote provider/OAuth validation is pending. |
+| Claude Desktop / Claude web | local stdio for Desktop where configured; remote Streamable HTTP connector | Legacy initialize handshake; protocol versions listed above | Local process access or remote OAuth; MCP1 remote OAuth not yet implemented/configured | Client tests are pending. Desktop Extension packaging is not included. |
+| ChatGPT | Remote Streamable HTTP only | Legacy initialize handshake; protocol versions listed above | Configured app authentication; MCP1 remote OAuth not yet implemented/configured | Requires an eligible plan/workspace and client test. Current staging intentionally rejects unauthenticated MCP requests. |
 
-MCP1's transport support does not imply every client supports the same features. Before deployment, record each named client's supported transport, protocol version, authentication flow, resource support, proxy behavior, and any required streaming/session headers. Keep an integration test for each client and hosting path.
+MCP1's transport support does not imply every client supports the same features. Client setup steps and rollout gates are in [CLIENT_SETUP.md](CLIENT_SETUP.md). Before deployment, record each named client's supported transport, protocol version, authentication flow, resource support, proxy behavior, and any required streaming/session headers. Keep an integration test for each client and hosting path.
 
 ## Upgrade and support policy
 

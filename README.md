@@ -61,6 +61,7 @@ npm run start:business
 - [Business identity and client authentication](docs/IDENTITY.md)
 - [Deployment and operations](docs/DEPLOYMENT.md)
 - [MCP client and protocol compatibility](docs/MCP_CLIENT_MATRIX.md)
+- [Setup for VS Code, Claude, and ChatGPT clients](docs/CLIENT_SETUP.md)
 - [Data governance](docs/DATA_GOVERNANCE.md)
 - [Operations runbook](docs/OPERATIONS_RUNBOOK.md)
 - [New application onboarding](docs/NEW_APP_ONBOARDING.md)
