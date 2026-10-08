@@ -12,10 +12,10 @@ Required settings:
 - `BUSINESS_AUDIENCE`: token audience assigned to MCP1.
 - `BUSINESS_JWKS_URL`: trusted OIDC signing-key endpoint.
 - `BUSINESS_ALLOWED_HOSTS`: comma-separated hostnames accepted by the service.
-- `BUSINESS_OAUTH_DISCOVERY_ENABLED=false` by default. Set to `true` only after choosing and configuring the identity provider and confirming target-client compatibility.
+- `BUSINESS_OAUTH_DISCOVERY_ENABLED=false` by default. Auth0 is selected; set to `true` only after its staging tenant/API is configured and target-client compatibility is confirmed.
 - `BUSINESS_RESOURCE_URL`: canonical public MCP URL (for example `https://mcp.example.com/mcp`); required when OAuth discovery is enabled. It must use HTTPS and a hostname in `BUSINESS_ALLOWED_HOSTS`.
 
-When enabled, `GET /.well-known/oauth-protected-resource` returns OAuth Protected Resource Metadata and invalid bearer requests to `/mcp` include its canonical URL in `WWW-Authenticate`. Both URLs come from explicit configuration; request Host headers never determine discovery metadata. This publishes the selected issuer as the authorization server, but does not implement OAuth login, consent, client registration, or token issuance. Keep discovery disabled until the organization selects an identity provider and validates the target clients. See [IDENTITY.md](IDENTITY.md).
+When enabled, `GET /.well-known/oauth-protected-resource` returns OAuth Protected Resource Metadata and invalid bearer requests to `/mcp` include its canonical URL in `WWW-Authenticate`. Both URLs come from explicit configuration; request Host headers never determine discovery metadata. This publishes the selected issuer as the authorization server, but does not implement OAuth login, consent, client registration, or token issuance. See [IDENTITY.md](IDENTITY.md) for Auth0 setup values and the staging sequence.
 
 Recommended settings:
 
@@ -59,7 +59,7 @@ On 2026-10-08, the cPanel account successfully ran the staging service at `https
 
 After the owner restarted the cPanel app following the latest `development` deployment, the same status and access-control probes returned the expected responses again: `/healthz` and `/readyz` 200, `/mcp` 401, OAuth metadata 404, and `package.json` plus `src/business.ts` 403. This verifies restart recovery and the current static-file deny rules; persistent audit-log behavior, outbound network restrictions, and resource limits remain to be checked.
 
-The cPanel app environment contains the staging host allowlist, disabled OAuth discovery, and a private audit-log path outside the document root. The identity-provider issuer, audience, and JWKS URL remain unset until a provider is selected. Build in the cPanel Node environment with `npm ci --include=dev`, `npm run build`, then `npm prune --omit=dev`. Keep cPanel's Passenger directives when maintaining the local `.htaccess` rules; the cPanel-specific file is excluded locally through `.git/info/exclude` and is not committed.
+The cPanel app environment contains the staging host allowlist, disabled OAuth discovery, and a private audit-log path outside the document root. Auth0 is selected, but its issuer, audience, JWKS URL, and protected-resource URL remain unset until its staging API is configured. Build in the cPanel Node environment with `npm ci --include=dev`, `npm run build`, then `npm prune --omit=dev`. Keep cPanel's Passenger directives when maintaining the local `.htaccess` rules; the cPanel-specific file is excluded locally through `.git/info/exclude` and is not committed.
 
 ## Scaling path
 

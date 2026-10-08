@@ -36,7 +36,7 @@ An effective call requires all three checks:
 
 ## Grant and provisioning rules
 
-- Grant scopes from reviewed provider-side groups or approved assignments only after an identity provider is selected. The current environment has no identity provider; do not implement role/group provisioning based on an assumed vendor.
+- Grant scopes from reviewed Auth0-side groups or approved assignments only after the staging tenant is configured. Do not implement role/group provisioning until the exact Auth0 claims and assignments have been verified.
 - Start with the existing health-only scopes. Require an application permission and verified actor bridge before adding any record scope.
 - Keep the provider's identity-group-to-MCP-scope mapping version controlled and reviewed. Use explicit group identifiers, not display names that administrators can rename.
 - Role or permission changes must take effect at the app authorization layer on the next request. Token scope changes should use short access-token lifetimes and the selected provider's tested revocation/introspection behavior.
@@ -45,7 +45,7 @@ An effective call requires all three checks:
 
 ## Periodic grant review
 
-Review each application's owner, active identity links, provider groups, MCP scopes, app permissions, and integration credentials at least quarterly and after an owner, identity, or security change. Confirm each grant still supports a named use case, remove unused grants and credentials, and record the reviewer, date, evidence, and follow-up actions. Future applications must enter this review through [NEW_APP_ONBOARDING.md](NEW_APP_ONBOARDING.md). No provider-side grants exist in the current implementation, so this procedure becomes operational when the identity provider and first business client are selected.
+Review each application's owner, active identity links, Auth0 groups, MCP scopes, app permissions, and integration credentials at least quarterly and after an owner, identity, or security change. Confirm each grant still supports a named use case, remove unused grants and credentials, and record the reviewer, date, evidence, and follow-up actions. Future applications must enter this review through [NEW_APP_ONBOARDING.md](NEW_APP_ONBOARDING.md). No Auth0-side grants exist in the current implementation, so this procedure becomes operational after tenant setup and the first business client are selected.
 
 ## Source locations reviewed
 

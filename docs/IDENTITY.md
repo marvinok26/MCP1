@@ -2,11 +2,27 @@
 
 ## Provider selection status
 
-The owner confirmed that the organization is not currently using an identity provider and instructed that the Auth0 recommendation remain provisional. The remote client set is several clients or not decided. No provider has been selected. When the organization chooses one, MCP1 must use that workforce OIDC provider rather than creating a second staff directory.
+**Selected provider: Auth0.** The owner chose Auth0 because UlterNet does not use Google Workspace or Microsoft Entra ID. The Auth0 tenant, API, client registrations, and staff assignments still need to be configured and exercised; selection alone does not mean remote sign-in is live. The supported remote client set is still undecided. Configure separate Auth0 environments for staging and production, and use Auth0 as the workforce identity provider rather than creating a second staff directory.
 
 UlterNet Systems is the parent organization for UlterPOS, Tranquil Pharmacy, the UlterNet website, Social apps, and Renegade. Use one workforce identity boundary for UlterNet staff across these products, with a separate development/staging environment from production. Keep product scopes distinct, and let each product's API enforce its own staff permissions, tenant/branch or ownership scope, and audit trail. Auth0 Organizations are primarily useful when modeling separate customer organizations; they are not required just because UlterNet owns several products.
 
-**Provisional recommendation:** evaluate Auth0 as the managed OIDC provider for the first business pilot. It avoids operating the identity control plane alongside the MCP service on shared hosting and supports standard OIDC and Authorization Code + PKCE. This is a recommendation, not a selected provider: first validate the actual MCP clients, organization domain, account ownership, cost, client registration behavior, and provider feature availability. Keep client authentication standards-based so a later issuer change does not alter MCP scopes or application APIs. If the team chooses self-hosted Keycloak, run it on a separately managed VPS/container with a production database, TLS, backups, recovery, monitoring, and a high-availability plan; do not place the identity service on cPanel shared hosting.
+Auth0 is a managed OIDC provider, so the team does not need Workspace or Entra ID to use it. Keep client authentication standards-based so a future issuer change does not alter MCP scopes or application APIs. Before staff rollout, validate account ownership, pricing for the chosen features, client registration behavior, and the actual remote clients. If the team later chooses self-hosted Keycloak, run it on a separately managed VPS/container with a production database, TLS, backups, recovery, monitoring, and a high-availability plan; do not place the identity service on cPanel shared hosting.
+
+### Auth0 staging configuration
+
+Create an Auth0 API for MCP1 in the staging tenant. Use the API Identifier as the exact token audience; a suitable value is `https://mcp-staging.ulternetsystems.com`. Use RS256 signing. Add the MCP scopes listed in `src/business.ts` (including `mcp:systems:list`, the per-system `:health:read` scopes, and the per-system `:marketing:read` scopes). Enable RBAC and adding permissions to access tokens if those options are available in the tenant. Assign only the scopes each test user needs. Do not use the Auth0 Management API as the MCP audience.
+
+Use the tenant's issuer exactly as shown by its OIDC discovery document, normally `https://<tenant-domain>/` with the trailing slash. Its JWKS URL is normally `https://<tenant-domain>/.well-known/jwks.json`. Configure cPanel's protected environment variables as follows, replacing the issuer with the exact value from Auth0:
+
+```dotenv
+BUSINESS_ISSUER_URL=https://<tenant-domain>/
+BUSINESS_AUDIENCE=https://mcp-staging.ulternetsystems.com
+BUSINESS_JWKS_URL=https://<tenant-domain>/.well-known/jwks.json
+BUSINESS_RESOURCE_URL=https://mcp-staging.ulternetsystems.com/mcp
+BUSINESS_OAUTH_DISCOVERY_ENABLED=true
+```
+
+`BUSINESS_ALLOWED_HOSTS` must include `mcp-staging.ulternetsystems.com`. Restart the cPanel app after saving. First check `/.well-known/oauth-protected-resource` and confirm it advertises the exact resource URL and Auth0 issuer; then check that an unauthenticated `/mcp` request returns 401 with the metadata pointer. Configure an actual client only after selecting it, and verify the full Authorization Code + PKCE flow, expected audience, scopes, refresh behavior, and logout/deactivation behavior. Auth0 does not make an arbitrary client compatible automatically; some clients may require a registered application and callback URL rather than dynamic registration.
 
 Provider acceptance requirements:
 
@@ -34,7 +50,7 @@ For unattended automation, use a dedicated provider client and the OAuth client-
 
 This deliberately combines the app-owned API boundary with an audience-specific delegated token. The application owns the API and policy decision; the exchanged token carries a verifiable user and actor chain. MCP1 scopes remain an additional tool gate and are not copied as a replacement for the app's own permissions.
 
-Token-exchange support depends on the identity provider, which remains unselected. If the eventual provider cannot issue constrained downstream tokens that preserve the actor, stop before enabling record tools and review an alternative trust design. Do not send the MCP-audience token to an app, forward a service token plus an unsigned user header, match identities by email, or use a shared administrator credential.
+Token-exchange support depends on Auth0 plan/features and remains unvalidated. If Auth0 cannot issue constrained downstream tokens that preserve the actor, stop before enabling record tools and review an alternative trust design. Do not send the MCP-audience token to an app, forward a service token plus an unsigned user header, match identities by email, or use a shared administrator credential.
 
 The bridge must fail closed when the identity link is missing, disabled, ambiguous, or out of sync. Provision and deactivate identity links through an audited app-owned path. Never accept local account IDs, tenant IDs, branch IDs, organizer IDs, or role claims from MCP tool arguments as authorization evidence.
 
@@ -48,15 +64,15 @@ The bridge must fail closed when the identity link is missing, disabled, ambiguo
 | **Social apps** | Add an actor-token verifier and map to the authenticated application user. Apply instance ownership for every read or write; keep channel API credentials behind the app. |
 | **Renegade** | Add a versioned API and actor-token verifier. Apply event organizer ownership for organizer tools; keep platform administration and finance actions separately permissioned and audited. |
 
-No provider, API actor-token verifier, identity link, or record tool is implemented by this architectural decision. The bridge can be prototyped with synthetic identities after the provider and first application are chosen.
+Auth0 selection does not implement the provider configuration, API actor-token verifier, identity link, or record tools. The bridge can be prototyped with synthetic identities after the Auth0 tenant and first application are configured.
 
 ## Current implementation boundary
 
-MCP1 verifies bearer JWTs and now has opt-in OAuth Protected Resource Metadata at `/.well-known/oauth-protected-resource`. Enable it with `BUSINESS_OAUTH_DISCOVERY_ENABLED=true` and configure the canonical HTTPS `BUSINESS_RESOURCE_URL`; the issuer comes from `BUSINESS_ISSUER_URL`. Unauthorized MCP requests then include the canonical metadata URL in `WWW-Authenticate`. Metadata is static configuration and never reflects an incoming Host header. Discovery remains disabled by default because no provider or client has been selected.
+MCP1 verifies bearer JWTs and now has opt-in OAuth Protected Resource Metadata at `/.well-known/oauth-protected-resource`. Enable it with `BUSINESS_OAUTH_DISCOVERY_ENABLED=true` and configure the canonical HTTPS `BUSINESS_RESOURCE_URL`; the issuer comes from `BUSINESS_ISSUER_URL`. Unauthorized MCP requests then include the canonical metadata URL in `WWW-Authenticate`. Metadata is static configuration and never reflects an incoming Host header. Discovery remains disabled by default until Auth0 staging and a target client are configured and validated.
 
-This makes the resource discoverable; it does not implement OAuth authorization, interactive login, consent, client registration, or token issuance. The selected provider and actual remote clients must still be validated for Authorization Code with PKCE, issuer/audience/scope behavior, and token lifecycle before staff rollout. Until then, the existing provisioned-bearer pilot boundary applies.
+This makes the resource discoverable; it does not implement OAuth authorization, interactive login, consent, client registration, or token issuance. Auth0 is selected, but its tenant and actual remote clients must still be configured and validated for Authorization Code with PKCE, issuer/audience/scope behavior, and token lifecycle before staff rollout. Until then, the existing provisioned-bearer pilot boundary applies.
 
-The deployed MCP TypeScript SDK line and protocol/client compatibility are tracked separately in [MCP_TODO.md](MCP_TODO.md). Provider-specific lifecycle and revocation behavior must be added here after the provider is selected.
+The deployed MCP TypeScript SDK line and protocol/client compatibility are tracked separately in [MCP_TODO.md](MCP_TODO.md). Auth0 lifecycle and revocation behavior must be added here after staging validation.
 
 ## Token lifecycle behavior and rollout gate
 
@@ -64,11 +80,11 @@ The current verifier checks the JWT signature, exact configured issuer and audie
 
 Access tokens are self-contained. Removing a user's provider assignment or a scope does not change a token already issued; that token can continue to work until its expiry. MCP1 has no token introspection, revocation list, or provider event hook today. Immediate deactivation/revocation therefore cannot be promised. Keep access-token lifetimes short and make the provider/client selection gate include a measured revocation delay. If the business requires immediate revocation, add and operate an online revocation/introspection mechanism before staff access is enabled.
 
-After a provider is selected, verify in a staging tenant: publish an overlapping signing key and rotate to it; retire the old key; remove one user's MCP assignment; remove one granted scope; deactivate the user; revoke an issued token; and record how long each already-issued token remains accepted. Repeat with each supported client and document the observed cache and refresh behavior. Do not treat the current JWT unit coverage as provider lifecycle validation.
+In the Auth0 staging tenant, verify: publish an overlapping signing key and rotate to it; retire the old key; remove one user's MCP assignment; remove one granted scope; deactivate the user; revoke an issued token; and record how long each already-issued token remains accepted. Repeat with each supported client and document the observed cache and refresh behavior. Do not treat the current JWT unit coverage as provider lifecycle validation.
 
 ## Protocol references
 
 - [MCP authorization specification, 2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization): MCP servers are OAuth resource servers; Protected Resource Metadata is required for authorization-server discovery; clients use OAuth Authorization Code with PKCE.
 - [MCP TypeScript SDK documentation](https://ts.sdk.modelcontextprotocol.io/): the installed `@modelcontextprotocol/sdk` v1 line implements the 2025-11-25 specification. Confirm the SDK/spec migration path in the compatibility review before treating this as a long-term client contract.
 - [RFC 8693: OAuth 2.0 Token Exchange](https://www.rfc-editor.org/rfc/rfc8693.html): defines token exchange and the distinction between delegation and impersonation. MCP1's downstream design keeps the user as subject and MCP1 as actor.
-- [Auth0 Authorization Code + PKCE](https://auth0.com/docs/api/authentication/authorization-code-flow-with-pkce/authorize-with-pkce) and [Auth0 Dynamic Client Registration](https://auth0.com/docs/get-started/applications/dynamic-client-registration): references for the provisional provider candidate, not evidence that the selected MCP clients have been tested.
+- [Auth0 Authorization Code + PKCE](https://auth0.com/docs/api/authentication/authorization-code-flow-with-pkce/authorize-with-pkce) and [Auth0 Dynamic Client Registration](https://auth0.com/docs/get-started/applications/dynamic-client-registration): setup references; they do not establish that the selected MCP clients have been tested.

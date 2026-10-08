@@ -10,7 +10,7 @@ This guide covers the three approved client families for MCP1: VS Code with GitH
 | Claude Code / Claude Desktop / Claude web | stdio for Code/Desktop; remote connector for web | Streamable HTTP with OAuth | Local Code/Desktop can be configured now. Remote sign-in awaits a provider and client validation. |
 | ChatGPT | Not directly; ChatGPT connects to remote MCP services | Remote MCP app; OAuth or another supported configured method | Requires an eligible ChatGPT plan/workspace and a completed MCP1 remote authentication flow. |
 
-The deployed MCP1 staging endpoint is `https://mcp-staging.ulternetsystems.com/mcp`. It currently rejects unauthenticated MCP requests. It does not issue login tokens or host an authorization server. Do not configure a tokenless connection or copy a long-lived token into client configuration. Auth0 remains a provisional provider candidate, not a selected dependency.
+The deployed MCP1 staging endpoint is `https://mcp-staging.ulternetsystems.com/mcp`. It currently rejects unauthenticated MCP requests. It does not issue login tokens or host an authorization server. Do not configure a tokenless connection or copy a long-lived token into client configuration. Auth0 is selected, but its tenant/API and a target remote client still need configuration and validation.
 
 ## Local developer access
 
@@ -78,7 +78,7 @@ The remote URL is the same for each client: `https://mcp-staging.ulternetsystems
 Do not use a shared bearer token as workforce sign-in. Before enabling remote access, complete these steps:
 
 1. Select the first remote client(s) and confirm the required plan/workspace controls.
-2. Select an identity provider (Auth0 is only provisional) and provision a separate development tenant/application.
+2. Configure the selected Auth0 staging tenant/API and register the first target client as required by that client's OAuth flow.
 3. Implement and configure MCP's OAuth protected-resource discovery and authorization flow for that provider/client combination; ensure refresh/revocation behavior is documented and tested.
 4. Set `BUSINESS_ISSUER_URL`, `BUSINESS_AUDIENCE`, `BUSINESS_JWKS_URL`, and canonical `BUSINESS_RESOURCE_URL`; enable `BUSINESS_OAUTH_DISCOVERY_ENABLED=true` only after these values are verified.
 5. Test tool discovery, denied and allowed scopes, token expiry/refresh, user deactivation, and key rotation using synthetic data.
