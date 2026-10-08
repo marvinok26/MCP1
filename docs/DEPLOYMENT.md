@@ -49,6 +49,12 @@ The hosting provider and plan must enable a persistent Node application and supp
 
 cPanel capabilities vary by provider. A working Node website is not sufficient proof of compatible MCP behavior. Use a VPS or managed container when the shared plan cannot meet these conditions or when multiple workers, shared rate limiting, stronger isolation, controlled network egress, or reliable deployment pipelines are required.
 
+### Verified staging account
+
+On 2026-10-08, the cPanel account successfully ran the staging service at `https://mcp-staging.ulternetsystems.com` using Node.js 24.21.0 and npm 11.19.0. Passenger served `/healthz` and `/readyz` with 200 responses; `/mcp` returned 401 without a bearer token, and protected-resource metadata returned 404 with OAuth discovery disabled. The repository checkout is at the domain document root by owner choice. A server-local `.htaccess` denies direct requests to `.git`, environment/config files, source, documentation, tests, build output, and dependency folders; probes for representative files returned 403. Re-run these probes after any cPanel app or `.htaccess` change.
+
+The cPanel app environment contains the staging host allowlist, disabled OAuth discovery, and a private audit-log path outside the document root. The identity-provider issuer, audience, and JWKS URL remain unset until a provider is selected. Build in the cPanel Node environment with `npm ci --include=dev`, `npm run build`, then `npm prune --omit=dev`. Keep cPanel's Passenger directives when maintaining the local `.htaccess` rules; the cPanel-specific file is excluded locally through `.git/info/exclude` and is not committed.
+
 ## Scaling path
 
 The HTTP handlers are stateless per request and do not keep MCP sessions in process. This makes horizontal scaling simpler. Before adding workers, move rate limiting to shared storage, audit events to a durable centralized sink, and secrets to a managed secret store. Add queue-backed jobs for long-running exports or reports; do not hold a tool request open while materializing large datasets.

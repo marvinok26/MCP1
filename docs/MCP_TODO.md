@@ -2,7 +2,7 @@
 
 This is the working delivery checklist for personal and business MCP functionality across UlterPOS, Tranquil Pharmacy, Devspark, Social apps, and Renegade. Update the boxes in the same commit as the work. A checked item means its acceptance evidence exists; planning or documentation alone does not complete an implementation item.
 
-**Status:** local and process-level foundation is implemented. Remaining production work is gated on owner choices, hosting access, or implementation in the owning application repositories.
+**Status:** local and process-level foundation is implemented, and the cPanel staging service is live and verified. Remaining production work is gated on owner choices, operational checks, or implementation in the owning application repositories.
 
 **Branch policy:** work on `development`, push completed milestones, fast-forward `main`, and push it.
 
@@ -31,7 +31,7 @@ This is the working delivery checklist for personal and business MCP functionali
 - [x] Document setup, security, operations, tool catalogue, decisions, integration patterns, and application readiness.
 - [x] Create and commit the npm lockfile.
 - [x] Install the locked dependencies and run the TypeScript build/typecheck; resolve the compiler errors found on 2026-10-08.
-- [x] Confirm and document supported Node/npm pairings for local and cPanel runtimes; Node 24.21.0/npm 11.19.0 is pinned for local work, and Node 22.23.3/npm 10.9.9 is the compatibility lane. cPanel still must offer a compatible runtime.
+- [x] Confirm and document supported Node/npm pairings for local and cPanel runtimes; Node 24.21.0/npm 11.19.0 is pinned for local work and runs on the cPanel staging account, with Node 22.23.3/npm 10.9.9 as the compatibility lane.
 - [x] Add automated tests for path traversal, secret exclusions, JWT issuer/audience/signature/expiry, scopes, CORS/Host checks, per-IP/user/global limits, audit redaction, and Streamable HTTP MCP transport handling; 3 files and 6 tests pass.
 - [x] Exercise personal stdio tools through the MCP SDK client against harmless README files in all five configured project roots; confirm `.env` access is refused.
 - [x] Exercise business Streamable HTTP initialization and tool calls with valid, expired, wrong-audience, and insufficient-scope tokens; the integration test serves a local JWKS, rejects expired/wrong-audience initialization with 401, completes a valid MCP session, and denies the health tool without its scope.
@@ -52,10 +52,11 @@ This is the working delivery checklist for personal and business MCP functionali
 
 ## Phase 3 — cPanel business pilot
 
-- [ ] Confirm the actual hosting account supports a persistent Node process and a supported runtime for the locked dependencies.
-- [ ] Deploy a non-production MCP endpoint behind HTTPS and configure exact Host and permitted Origin values.
+- [x] Confirm the actual hosting account supports a persistent Node process and a supported runtime for the locked dependencies; Node 24.21.0/npm 11.19.0 is running on cPanel Web Apps.
+- [x] Deploy a non-production MCP endpoint behind HTTPS and configure the exact Host allowlist; browser Origin access remains closed because no browser client has been selected.
 - [ ] Verify the chosen MCP client can initialize and make tool calls through the cPanel proxy; check required headers, POST behavior, and streaming behavior.
-- [ ] Confirm Passenger-provided port binding, restart/redeploy, environment secrets, outbound host allowlisting, logs, and process limits.
+- [x] Confirm Passenger routing/port binding and cPanel environment-variable configuration through successful health/readiness responses.
+- [ ] Exercise restart/redeploy, verify log persistence, outbound host controls, and record process/resource limits.
 - [ ] Configure trusted-proxy IP handling only if the proxy overwrites forwarded-address headers.
 - [ ] Verify health endpoint credentials, timeout, TLS, redirect rejection, and safe failure behavior.
 - [ ] Record capacity limits and a tested move path to a VPS/container host.
@@ -128,7 +129,7 @@ These changes belong in the respective application repositories. No record-level
 - [ ] Move rate limiting from process memory to shared storage before multiple workers/instances.
 - [ ] Move JSONL audit output to a durable, access-controlled, append-only sink with retention/rotation and alerting.
 - [ ] Add dashboards for request volume, tool latency, downstream failures, rate limiting, and auth denials without logging business payloads.
-- [x] Add a weekly dependency update cadence for npm packages and GitHub Actions, plus a scheduled weekly dependency audit in CI; repository security-update settings still need to be enabled by an owner.
+- [x] Add a weekly dependency update cadence for npm packages and GitHub Actions, plus a scheduled weekly dependency audit in CI; Dependabot alerts and security updates are enabled in the repository settings (2026-10-08).
 - [x] Add graceful shutdown, listener readiness, per-process bounded health-check concurrency, and per-system downstream circuit breaking; shared multi-worker controls remain a scaling task.
 - [x] Add host-neutral deployment rollback, secret rotation, backup/recovery, and incident response procedures in `OPERATIONS_RUNBOOK.md`; fill host-specific contacts, recovery objectives, and rehearse in staging before production.
 - [ ] Reassess cPanel when usage, availability, worker count, network isolation, or audit retention outgrows shared hosting.
@@ -139,9 +140,8 @@ These changes belong in the respective application repositories. No record-level
 
 - Select the workforce identity provider; Auth0 remains a provisional candidate only. Confirm its issuer, staff lifecycle, token/revocation requirements, and support for delegated actor tokens.
 - Name the supported remote and personal MCP clients and the first low-risk business workflow; OAuth, client prompts, resource support, and app API work depend on those selections.
-- Provide the actual cPanel provider/plan and staging access, or select another hosting target, so the persistent Node runtime, proxy behavior, limits, and recovery path can be exercised.
+- Confirm cPanel resource limits, log retention, and recovery path; the account now runs the staging service on Node 24.21.0, but those operational limits remain unverified.
 - Name the organization privacy/legal approver and approve numeric retention periods, deletion authority, legal holds, and backup expiry before real personal data is used.
-- Enable repository Dependabot security updates/alerts in GitHub settings; workflow and weekly update configuration are in the repository, but account settings are controlled outside Git.
 - Approve the confirmation policy before adding any personal file-write or command-execution tool. No such tool is exposed today.
 - Confirm which fixed project command profiles are permitted and whether each may write files or invoke network/deployment actions; no generic shell tool will be added.
 - Approve the business roles, thresholds, and separation-of-duties rules for write approvals before any app enables a mutating or externally visible MCP action.
@@ -150,7 +150,7 @@ These changes belong in the respective application repositories. No record-level
 ## Automated work that remains gated by these decisions
 
 - OAuth provider lifecycle/revocation verification, named-client interoperability, and resource-template client exercise.
-- Non-production cPanel deployment and verification of the selected proxy, runtime, logs, and capacity.
+- Client interoperability plus cPanel log, resource-limit, and capacity verification for the deployed non-production service.
 - Business API bridges and record tools in each owning application, followed by typed MCP adapters and synthetic-data permission tests.
 - Final numeric retention implementation and centralized durable audit storage after retention requirements and operational ownership are approved.
 - Browser automation and client-specific connection profiles after target clients, URLs, and synthetic staging data are named.
@@ -178,3 +178,4 @@ These changes belong in the respective application repositories. No record-level
 - **2026-10-08:** Added the new-application onboarding template, documented quarterly access/integration review, and added host-neutral deployment, rollback, secret-rotation, recovery, and incident procedures. Environment-specific approvals and staging rehearsal remain outstanding.
 - **2026-10-08:** The first CI run failed because `personal-stdio.test.ts` assumed local project directories existed on hosted runners. Reworked it to create temporary fixtures for all five projects and verify documentation resource listing/read plus secret and hidden-path exclusion. Added readiness and circuit-breaker integration coverage. `npm run build` and all 10 tests pass locally; CI passed on both branches for `0c7472b` across Node 22/24, including the high-severity dependency audit.
 - **2026-10-08:** Added a host-neutral runbook for deployment/rollback, secret and signing-key rotation, incident response, backup/recovery, and monitoring. Host contacts, recovery objectives, privacy decisions, and staging rehearsal remain deployment prerequisites.
+- **2026-10-08:** Deployed MCP1 staging to `mcp-staging.ulternetsystems.com` on cPanel Web Apps with Node.js 24.21.0/npm 11.19.0. The owner chose to keep the checkout at the domain document root; server-local `.htaccess` rules deny direct access to repository/source/config paths, verified as 403. Build completed with `npm ci --include=dev`, `npm run build`, and `npm prune --omit=dev`; npm reported zero vulnerabilities. `/healthz` and `/readyz` return 200, unauthenticated `/mcp` returns 401, and protected-resource metadata returns 404 while discovery is disabled. Client protocol interoperability, provider setup, logs, limits, and recovery remain pending.
