@@ -76,7 +76,7 @@ export function createBusinessApp(authenticate: (header: string | undefined) => 
       resource: resourceUrl.href,
       authorization_servers: [issuerUrl.href],
       bearer_methods_supported: ['header'],
-      scopes_supported: ['mcp:systems:list', ...['ulterpos', 'tranquil', 'ulternet', 'social-apps', 'renegade'].map((system) => `system:${system}:health:read`)],
+      scopes_supported: ['mcp:systems:list', ...['ulterpos', 'tranquil', 'ulternet', 'social-apps', 'renegade'].flatMap((system) => [`system:${system}:health:read`, `system:${system}:marketing:read`])],
     });
   });
   app.all('/mcp', (req, res, next) => app.locals.mcpReady

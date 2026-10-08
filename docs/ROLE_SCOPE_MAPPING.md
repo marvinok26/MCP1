@@ -2,7 +2,7 @@
 
 ## Status and rule
 
-This is the authorization mapping policy for business MCP tools. The organization has not selected an identity provider, and the MCP server currently exposes only system listing and health checks. No application record scopes are issued or implemented today. The mappings below define what a future grant must mean; they do not create staff accounts or grant anyone access.
+This is the authorization mapping policy for business MCP tools. The organization has not selected an identity provider. MCP1 exposes system listing and health checks, plus opt-in aggregate Google marketing reports for explicitly configured properties. No application record scopes are issued. The mappings below define what a future grant must mean; they do not create staff accounts or grant anyone access.
 
 An MCP scope is an additional tool-level gate, never a replacement for an application's permission policy, tenant/branch/owner scope, field security, subscription gate, or audit log. The app must authorize every request as the verified actor. A role name, user ID, branch ID, or permission list supplied by a client is never trusted as proof of identity or access.
 
@@ -14,6 +14,7 @@ Current MCP scope names:
 | --- | --- | --- |
 | `mcp:systems:list` | List systems for which the actor has health access | Grant only to named business users approved to discover integrations |
 | `system:<system>:health:read` | Call that system's configured, minimal health endpoint | Grant per system to approved operations/support staff; health access is not inherited from an app role |
+| `system:<system>:marketing:read` | Read aggregate GA4 and Search Console summaries for the system's explicitly configured public-site properties | Grant only to named marketing/management users approved to view those site's acquisition metrics; service-account property access is read-only and separately limited to configured properties |
 
 Future record tools use a stable namespace: `system:<system>:<domain>:<action>`, for example `system:ulterpos:reports:read` or `system:renegade:events:summary:read`. Use the narrowest resource/action pair. Do not add `*:admin`, `*:write`, or one all-systems scope. Write and export scopes require separate review and tool registration.
 

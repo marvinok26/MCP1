@@ -92,7 +92,7 @@ These changes belong in the respective application repositories. No record-level
 - [ ] Add read-only draft identifiers/status and draft preview endpoints with field minimization.
 - [ ] Add a separate publishing preview/approval workflow; do not make ordinary content preparation publishable by default.
 - [ ] Scope contact-message summaries and replies to authorized staff; minimize personal information in MCP results.
-- [ ] Choose and configure the website traffic/search analytics source and privacy-reviewed lead-source attribution before implementing client-reach reporting.
+- [x] Choose GA4 and Search Console for the UlterNet website and Social Apps property; the owner reports consent-gated GA4 tracking and Search Console ownership setup complete. The MCP reporting adapter is implemented; Google API credentials and property IDs remain deployment prerequisites.
 - [ ] Add a narrowly authenticated, aggregate-only inquiry/conversion summary API; never return contact details or message content from this reporting tool.
 
 ### Social apps
@@ -113,6 +113,8 @@ These changes belong in the respective application repositories. No record-level
 
 ## Phase 5 — Business MCP adapters
 
+- [x] Implement an opt-in read-only Google reporting adapter for configured GA4 and Search Console properties: aggregate channel and landing-page metrics plus Search Console page performance; bound ranges/results, remove query strings, omit search terms/identifiers, and use per-system scopes.
+- [ ] Configure Google reporting in staging with least-privilege service-account access to the intended properties; confirm live responses and insufficient-permission failures without exposing credentials.
 - [ ] Implement one typed adapter per application using fixed route mappings and application-owned APIs.
 - [ ] Propagate delegated identity or exchanged short-lived tokens; never trust a caller-supplied user ID/role header.
 - [ ] Map app permissions to narrow MCP scopes and keep scopes distinct across systems.
@@ -125,6 +127,7 @@ These changes belong in the respective application repositories. No record-level
 
 ## Phase 6 — Personal development improvements
 
+- [x] Add local-only, read-only GA4 and Search Console reporting tools to the personal MCP, sharing the bounded Google client with business mode; configure credentials locally before use.
 - [x] Add a bounded repository documentation resource template without reading secrets or generated artifacts; exercise it with the selected local client before relying on resource support.
 - [ ] Add optional browser automation for local/staging UI flows using synthetic data.
 - [ ] Add explicit command profiles for safe project tasks; never expose a generic shell tool.
@@ -147,7 +150,9 @@ These changes belong in the respective application repositories. No record-level
 ## Awaiting owner decisions and external prerequisites
 
 - Select the workforce identity provider; Auth0 remains a provisional candidate only. Confirm its issuer, staff lifecycle, token/revocation requirements, and support for delegated actor tokens.
-- Name the supported remote and personal MCP clients and the first low-risk business workflow; OAuth, client prompts, resource support, and app API work depend on those selections.
+- Name the supported remote and personal MCP clients; the initial low-risk reporting workflow is selected, but OAuth, client prompts, resource support, and broader app API work depend on the remaining client/provider choices.
+- Configure the Google Cloud Analytics Data API and Search Console API, create a dedicated least-privilege reporting service identity, grant it Viewer/read access only to the intended properties, and add its credentials plus numeric GA4 property IDs and exact Search Console property names to cPanel's protected environment settings. Never send the private key through chat or commit it.
+- Add the same Google reporting environment values to the local MCP `.env` only if you want these tools in Claude Code; keep that key out of the project files and chat.
 - Confirm cPanel resource limits, log retention, and recovery path; the account now runs the staging service on Node 24.21.0, but those operational limits remain unverified.
 - Name the organization privacy/legal approver and approve numeric retention periods, deletion authority, legal holds, and backup expiry before real personal data is used.
 - Approve the confirmation policy before adding any personal file-write or command-execution tool. No such tool is exposed today.

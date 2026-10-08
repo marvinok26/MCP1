@@ -3,9 +3,11 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { allProjects, optionalEnv } from './config.js';
 import { audit } from './audit.js';
 import { requireScope, type BusinessIdentity } from './security.js';
+import { analyticsChannelSummary, analyticsLandingPageSummary, searchPerformanceSummary, type ReportingSystem } from './google-reporting.js';
 
 const projects = allProjects();
 const projectKey = z.enum(['ulterpos', 'tranquil', 'ulternet', 'social-apps', 'renegade']);
+const reportDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD dates');
 const textResult = (text: string) => ({ content: [{ type: 'text' as const, text }] });
 const maxConcurrentHealthChecks = Number(process.env.BUSINESS_MAX_CONCURRENT_HEALTH_CHECKS ?? 20);
 const healthCircuits = new Map<string, { failures: number; openUntil: number; probeInFlight: boolean }>();
@@ -120,5 +122,32 @@ export function registerBusinessTools(server: McpServer, identity: BusinessIdent
     } finally {
       activeHealthChecks -= 1;
     }
+  }));
+
+  server.registerTool('marketing_channel_summary', {
+    title: 'Summarize website traffic by channel',
+    description: 'Return aggregate GA4 sessions, active users, and key events by channel for a configured UlterNet property. Date ranges are limited to 90 days; no visitor identifiers are returned.',
+    inputSchema: { system: projectKey, start_date: reportDate, end_date: reportDate },
+  }, async ({ system, start_date, end_date }) => audited(identity, requestId, 'marketing_channel_summary', async () => {
+    requireScope(identity, `system:${system}:marketing:read`);
+    return textResult(JSON.stringify(await analyticsChannelSummary(system as ReportingSystem, start_date, end_date), null, 2));
+  }));
+
+  server.registerTool('marketing_landing_pages', {
+    title: 'Summarize website landing pages',
+    description: 'Return aggregate GA4 sessions, active users, and key events for the top 25 landing-page paths. Query strings are omitted and date ranges are limited to 90 days.',
+    inputSchema: { system: projectKey, start_date: reportDate, end_date: reportDate },
+  }, async ({ system, start_date, end_date }) => audited(identity, requestId, 'marketing_landing_pages', async () => {
+    requireScope(identity, `system:${system}:marketing:read`);
+    return textResult(JSON.stringify(await analyticsLandingPageSummary(system as ReportingSystem, start_date, end_date), null, 2));
+  }));
+
+  server.registerTool('marketing_search_performance', {
+    title: 'Summarize organic search performance',
+    description: 'Return aggregate Search Console clicks, impressions, click-through rate, average position, and top page paths for a configured property. Search terms and visitor identifiers are excluded; date ranges are limited to 90 days.',
+    inputSchema: { system: projectKey, start_date: reportDate, end_date: reportDate },
+  }, async ({ system, start_date, end_date }) => audited(identity, requestId, 'marketing_search_performance', async () => {
+    requireScope(identity, `system:${system}:marketing:read`);
+    return textResult(JSON.stringify(await searchPerformanceSummary(system as ReportingSystem, start_date, end_date), null, 2));
   }));
 }

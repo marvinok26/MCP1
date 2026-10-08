@@ -126,7 +126,7 @@ test('Streamable HTTP exposes scoped tools and writes redacted audit records', a
   try {
     await client.connect(transport as unknown as Transport);
     const { tools } = await client.listTools();
-    assert.deepEqual(tools.map((tool) => tool.name).sort(), ['business_system_health', 'business_systems_list']);
+    assert.deepEqual(tools.map((tool) => tool.name).sort(), ['business_system_health', 'business_systems_list', 'marketing_channel_summary', 'marketing_landing_pages', 'marketing_search_performance']);
 
     const list = await client.callTool({ name: 'business_systems_list', arguments: {} });
     assert.equal(list.isError, undefined);
@@ -222,7 +222,7 @@ test('business Streamable HTTP enforces signed-token claims and tool scopes end 
     try {
       await client.connect(transport as unknown as Transport);
       const { tools } = await client.listTools();
-      assert.deepEqual(tools.map((tool) => tool.name).sort(), ['business_system_health', 'business_systems_list']);
+      assert.deepEqual(tools.map((tool) => tool.name).sort(), ['business_system_health', 'business_systems_list', 'marketing_channel_summary', 'marketing_landing_pages', 'marketing_search_performance']);
       const systems = await client.callTool({ name: 'business_systems_list', arguments: {} });
       assert.equal(systems.isError, undefined);
       assert.equal(((systems.content as Array<{ text?: string }>)[0])?.text, '[]');

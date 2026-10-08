@@ -2,7 +2,7 @@
 
 ## Trust boundaries
 
-- Personal stdio is a local developer capability limited to configured project roots.
+- Personal stdio is a local developer capability limited to configured project roots plus explicitly configured, aggregate-only Google marketing reports.
 - Business Streamable HTTP is a remote capability for authenticated users and must use HTTPS at the edge.
 - Each application remains authoritative for its users, permissions, tenancy, record scopes, business validation, and audit trail.
 - MCP1 has no production database credentials and does not read project `.env` files.
@@ -21,6 +21,7 @@ Current business scopes:
 - `system:ulternet:health:read`
 - `system:social-apps:health:read`
 - `system:renegade:health:read`
+- `system:<key>:marketing:read` for explicitly configured GA4 and Search Console reporting properties
 
 The app-specific role-to-scope mapping policy and known gaps are in [ROLE_SCOPE_MAPPING.md](ROLE_SCOPE_MAPPING.md). Health scopes are explicitly assigned to approved operations users; app roles do not grant health or record access by name alone.
 
@@ -35,7 +36,9 @@ Application record tools must additionally call application APIs using a delegat
 - Schemas validate tool arguments before handlers run.
 - Input body size is limited to 1 MB and the SDK tool-argument element count is bounded.
 - Health endpoint URLs are operator configuration, require HTTPS, reject embedded credentials and fragments, and refuse redirects.
+- Google reporting uses fixed Google API hosts, read-only OAuth scopes, allowlisted configured properties, short-lived service-account access tokens, fixed report shapes, and bounded dates, result counts, response sizes, and request times. Search terms and visitor identifiers are excluded; query strings are removed from landing-page paths.
 - Personal paths are resolved through `realpath`, checked against the configured project root, and filtered for sensitive/generated paths.
+- Personal Google reports use the same fixed read-only Google API calls and bounds as business mode. The local `.env` service-account credential is an owner-controlled capability; never copy it into a project, client prompt, or source control.
 - External commands use `execFile` with fixed executable names and argument arrays. User text is never evaluated by a shell.
 - The HTTP service enforces configured Host names, optional browser Origin allowlisting, no-store responses, and per-process global, per-IP, and per-user rate limits. Downstream health calls have a bounded concurrency gate and per-system circuit breaker.
 - Reverse-proxy IP forwarding is disabled by default. Enable trust only for the documented local proxy case where forwarded client addresses are overwritten by that proxy.
@@ -49,6 +52,7 @@ The starter rate limiter and audit file are process-local. Use a shared rate-lim
 ## Operations
 
 - Keep secrets in the host's protected environment configuration, not source control.
+- Give the Google reporting service account only Viewer/read access to the exact configured Analytics and Search Console properties. Prefer host-provided workload identity where available; on cPanel, protect and rotate any required private key in the account's environment settings.
 - Use a service identity with read-only health-check access for the pilot.
 - Rotate and revoke keys; monitor authentication failures and unusual tool volume.
 - Keep dependency updates reviewed and lockfile changes committed.

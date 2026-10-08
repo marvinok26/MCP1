@@ -4,6 +4,8 @@
 
 Each project adapter owns only the translation between MCP tool inputs and that application's supported API. It must not duplicate application policy or use a broad database connection. Shared MCP code owns authentication, scope checks, rate limiting, and redacted audit metadata.
 
+For an explicitly approved third-party reporting integration such as Google Analytics or Search Console, the external property is the data authority instead of an application API. Restrict its service identity to read-only access on the exact configured properties, require a separate MCP scope per system, and return aggregate fields only. Do not extend this exception to contact records, customer profiles, messages, or app writes.
+
 Before implementation, document:
 
 - System owner and API base URL for each environment.

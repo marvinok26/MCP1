@@ -4,8 +4,8 @@ MCP1 is a modular Model Context Protocol platform for local development work and
 
 ## Operating modes
 
-- **Personal:** a local stdio server for project discovery, code/document search, bounded documentation resources, safe file reading, and Git review.
-- **Business:** a remote Streamable HTTP server with OIDC/JWT bearer-token validation, per-tool scopes, redacted audit events, process limits, readiness, graceful shutdown, and configured system health checks. Protected-resource OAuth metadata is opt-in; sign-in and token issuance are not implemented.
+- **Personal:** a local stdio server for project discovery, code/document search, bounded documentation resources, safe file reading, Git review, and optional aggregate GA4/Search Console reporting.
+- **Business:** a remote Streamable HTTP server with OIDC/JWT bearer-token validation, per-tool scopes, redacted audit events, process limits, readiness, graceful shutdown, configured system health checks, and optional aggregate GA4/Search Console reporting. Protected-resource OAuth metadata is opt-in; sign-in and token issuance are not implemented.
 
 The modes share project metadata and integration contracts. They do not share credentials or execution privileges. Business tools call application-owned APIs; they do not connect directly to production databases.
 
@@ -15,11 +15,11 @@ The modes share project metadata and integration contracts. They do not share cr
 | --- | --- | --- | --- |
 | `ulterpos` | UlterPOS | `/home/seint/Dev/Work/pos/ulterpos` | Health endpoint configurable; operational tools require an app API contract |
 | `tranquil` | Tranquil Pharmacy | `/home/seint/Dev/Work/tranquil` | Health endpoint configurable; pharmacy tools require an app API contract |
-| `ulternet` | UlterNet website | `/home/seint/Dev/Self/Apps/UlterNet-Systems/Company/UlterNet/website/devspark` | Health endpoint configurable; CMS tools require an app API contract |
-| `social-apps` | Social apps | `/home/seint/Dev/Self/Apps/UlterNet-Systems/Social/social-apps` | Health endpoint configurable; product workflows are not yet defined |
+| `ulternet` | UlterNet website | `/home/seint/Dev/Self/Apps/UlterNet-Systems/Company/UlterNet/website/devspark` | Health endpoint configurable; aggregate GA4/Search Console reports are opt-in; CMS tools require an app API contract |
+| `social-apps` | Social apps | `/home/seint/Dev/Self/Apps/UlterNet-Systems/Social/social-apps` | Health endpoint configurable; aggregate GA4/Search Console reports are opt-in; product workflows are not yet defined |
 | `renegade` | Renegade Tickets & Events | `/home/seint/Dev/Self/Apps/UlterNet-Systems/Tickets&Events/renegade/website/renegade` | Health endpoint configurable; ticketing tools require an app API contract |
 
-Paths can be overridden in local configuration. MCP1 never reads `.env` files and ignores secret/build/vendor paths.
+Project paths can be overridden in MCP1's own local `.env`. Personal project tools never read `.env` files inside the configured projects and continue to ignore secret/build/vendor paths. Google reporting credentials, when configured, are only read by the dedicated reporting client.
 
 All listed products belong to UlterNet Systems. They can share a workforce identity provider while each product continues to enforce its own permissions, tenant boundaries, and audit rules.
 
@@ -74,4 +74,4 @@ npm run start:business
 
 ## Current limits
 
-Business mode currently lists configured systems and checks their configured health endpoints. It does not yet read or change business records. Each record workflow must be implemented against the owning application's API and permission model before it is enabled.
+Business mode does not read or change application business records. If Google reporting is configured, its marketing tools read only aggregate Analytics and Search Console reports for allowlisted properties. Each future application-record workflow must be implemented against the owning application's API and permission model before it is enabled.

@@ -28,6 +28,10 @@ Recommended settings:
 - `AUDIT_LOG_PATH` on a private persistent volume.
 - Per-system `SYSTEM_<KEY>_HEALTH_URL` and optional `SYSTEM_<KEY>_HEALTH_TOKEN` values.
 
+For opt-in aggregate GA4/Search Console reports, configure `GOOGLE_REPORTING_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_REPORTING_SERVICE_ACCOUNT_PRIVATE_KEY`, `GOOGLE_ANALYTICS_PROPERTY_IDS`, and `GOOGLE_SEARCH_CONSOLE_SITES`. Enable the Analytics Data API and Search Console API in the Google Cloud project. Give the dedicated service account Viewer access only to each configured Analytics property and Restricted user access only to each configured Search Console property. Set the GA4 **numeric property ID**, not the web stream ID or `G-` Measurement ID. Property mappings use comma-separated pairs such as `ulternet=123456789,social-apps=987654321`; Search Console values use the exact verified property, for example `ulternet=https://ulternetsystems.com/,social-apps=https://socialapps-api.com/`. Store the service account private key only in cPanel's protected environment settings, use literal `\n` sequences for line breaks if the environment editor requires a single line, rotate the key, and restart the application after changes. On hosts that support workload identity, use short-lived host-issued credentials instead of a downloaded key.
+
+The three marketing report tools require a `system:<key>:marketing:read` MCP scope. Grant it only to staff who should see site-level acquisition data. Staging and production should be configured only for properties that the reporting service identity is explicitly authorized to read.
+
 Start with `npm run start:business`. The endpoint is `/mcp`; `/healthz` is process liveness and `/readyz` reports whether the listener is accepting work. Readiness does not probe downstream systems. On SIGTERM/SIGINT the service stops accepting connections, drains active requests for up to 10 seconds, and then closes remaining connections. Health-check calls are bounded per process and a system circuit opens after five failures for 30 seconds. These limits are process-local and do not replace shared controls before multi-worker deployment.
 
 MCP1 does not currently expire audit records automatically. Keep the business pilot synthetic or non-personal until the organization approves retention periods and deletion authority and the deployment has a tested retention process. See [DATA_GOVERNANCE.md](DATA_GOVERNANCE.md).
@@ -43,7 +47,7 @@ The hosting provider and plan must enable a persistent Node application and supp
 3. The `/mcp` route supports the POST request/response behavior required by the target MCP client. Verify streaming behavior too if that client needs it.
 4. HTTPS terminates correctly and the configured host reaches the app.
 5. Protected environment variables, restart/redeploy controls, useful logs, and sufficient process/memory limits are available.
-6. The app can reach only the required health/API hosts; no public database ports are exposed.
+6. The app can reach only the required health/API hosts and, when reporting is enabled, the fixed Google OAuth, Analytics Data, and Search Console APIs; no public database ports are exposed.
 7. Logs and audit output persist through restarts and have rotation/retention configured.
 8. A failed app restart and revoked OIDC key are exercised before launch.
 
