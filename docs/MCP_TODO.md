@@ -152,7 +152,7 @@ These changes belong in the respective application repositories. No record-level
 - Select the workforce identity provider; Auth0 remains a provisional candidate only. Confirm its issuer, staff lifecycle, token/revocation requirements, and support for delegated actor tokens.
 - Name the supported remote and personal MCP clients; the initial low-risk reporting workflow is selected, but OAuth, client prompts, resource support, and broader app API work depend on the remaining client/provider choices.
 - Configure the Google Cloud Analytics Data API and Search Console API, create a dedicated least-privilege reporting service identity, grant it Viewer/read access only to the intended properties, and add its credentials plus numeric GA4 property IDs and exact Search Console property names to cPanel's protected environment settings. Never send the private key through chat or commit it.
-- Add the same Google reporting environment values to the local MCP `.env` only if you want these tools in Claude Code; keep that key out of the project files and chat.
+- Configure the local MCP `.env` with its own Google service-account credential only if you want these tools in Claude Code; grant only the intended properties and keep the key out of project files and chat.
 - Confirm cPanel resource limits, log retention, and recovery path; the account now runs the staging service on Node 24.21.0, but those operational limits remain unverified.
 - Name the organization privacy/legal approver and approve numeric retention periods, deletion authority, legal holds, and backup expiry before real personal data is used.
 - Approve the confirmation policy before adding any personal file-write or command-execution tool. No such tool is exposed today.
