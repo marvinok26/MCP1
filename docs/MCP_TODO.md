@@ -37,7 +37,9 @@ This is the working delivery checklist for personal and business MCP functionali
 - [x] Exercise business Streamable HTTP initialization and tool calls with valid, expired, wrong-audience, and insufficient-scope tokens; the integration test serves a local JWKS, rejects expired/wrong-audience initialization with 401, completes a valid MCP session, and denies the health tool without its scope.
 - [x] Review current MCP SDK/spec compatibility and record the supported client/protocol matrix in `MCP_CLIENT_MATRIX.md`; named clients remain unselected, and SDK v2 migration needs a scheduled review.
 - [x] Document local and remote connection instructions and rollout gates for VS Code/Copilot, Claude, and ChatGPT in `CLIENT_SETUP.md`.
-- [ ] Exercise the personal stdio server in each selected local client and record actual client versions and results.
+- [x] Register the personal stdio server in Claude Code user settings and verify the connection reports Connected.
+- [ ] Install/enable a VS Code MCP-capable chat extension, then exercise and record the registered server connection.
+- [ ] Exercise the personal stdio server in Claude Desktop or select that client as out of scope for the initial rollout.
 - [ ] Validate remote Streamable HTTP, OAuth login/refresh, and tool discovery for each selected business client after the identity provider is selected.
 - [x] Add a CI workflow for install, typecheck, unit/security tests, dependency audit, and build across Node 22 and 24.
 
