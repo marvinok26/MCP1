@@ -3,6 +3,16 @@ dist/
 .env
 .env.*
 !.env.example
+.npmrc
+!.npmrc.example
+secrets/
+.secrets/
+*.pem
+*.p12
+*.pfx
+*.keystore
+id_rsa
+id_ed25519
 npm-debug.log*
 coverage/
 var/
