@@ -15,11 +15,13 @@ The modes share project metadata and integration contracts. They do not share cr
 | --- | --- | --- | --- |
 | `ulterpos` | UlterPOS | `/home/seint/Dev/Work/pos/ulterpos` | Health endpoint configurable; operational tools require an app API contract |
 | `tranquil` | Tranquil Pharmacy | `/home/seint/Dev/Work/tranquil` | Health endpoint configurable; pharmacy tools require an app API contract |
-| `devspark` | Devspark website | `/home/seint/Dev/Self/Apps/UlterNet-Systems/Company/UlterNet/website/devspark` | Health endpoint configurable; CMS tools require an app API contract |
+| `ulternet` | UlterNet website | `/home/seint/Dev/Self/Apps/UlterNet-Systems/Company/UlterNet/website/devspark` | Health endpoint configurable; CMS tools require an app API contract |
 | `social-apps` | Social apps | `/home/seint/Dev/Self/Apps/UlterNet-Systems/Social/social-apps` | Health endpoint configurable; product workflows are not yet defined |
 | `renegade` | Renegade Tickets & Events | `/home/seint/Dev/Self/Apps/UlterNet-Systems/Tickets&Events/renegade/website/renegade` | Health endpoint configurable; ticketing tools require an app API contract |
 
 Paths can be overridden in local configuration. MCP1 never reads `.env` files and ignores secret/build/vendor paths.
+
+All listed products belong to UlterNet Systems. They can share a workforce identity provider while each product continues to enforce its own permissions, tenant boundaries, and audit rules.
 
 ## Quick start
 

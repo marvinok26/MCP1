@@ -10,7 +10,7 @@
 | `git_status` | Show branch and changed-file status | Fixed Git subcommand |
 | `git_diff` | Review working or staged diff | Fixed Git subcommand; 100 KB output cap; no stage/commit/reset/push operations |
 
-Personal project keys: `ulterpos`, `tranquil`, `devspark`, `social-apps`, and `renegade`.
+Personal project keys: `ulterpos`, `tranquil`, `ulternet`, `social-apps`, and `renegade`. The `ulternet` key maps to the local website repository folder named `devspark`.
 
 Project roots can be overridden with the corresponding `PROJECT_<KEY>_PATH` settings in `.env`. An unavailable root produces an actionable configuration message; search reports a missing ripgrep installation; Git review reports when a configured root is not a Git repository.
 

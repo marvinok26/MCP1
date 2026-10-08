@@ -20,7 +20,7 @@ Runs as an authenticated remote Streamable HTTP service. The first implementatio
 | --- | --- | --- | --- |
 | UlterPOS | Repository search, safe file read, Git review | Configured health check | Tenant/branch-scoped sales, stock, purchasing, and report summaries through approved APIs |
 | Tranquil Pharmacy | Repository search, safe file read, Git review | Configured health check | Permission-scoped pharmacy and sync diagnostics through approved APIs; synthetic/local data for development |
-| Devspark | Repository search, safe file read, Git review | Configured health check | Draft and review site content; publishing remains an approved human action |
+| UlterNet website | Repository search, safe file read, Git review | Configured health check | Draft and review site content; publishing remains an approved human action |
 | Social apps | Repository search, safe file read, Git review | Configured health check | To be defined from real product workflows and supported integrations |
 | Renegade Tickets & Events | Repository search, safe file read, Git review | Configured health check | Event and ticket summaries, scan diagnostics, reconciliation and settlement status; refunds, publishing, and financial actions require explicit authorization |
 

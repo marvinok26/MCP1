@@ -8,7 +8,7 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 
 test('personal stdio server serves safe files and documentation resources from configured roots', async () => {
   const fixtureRoot = await mkdtemp(path.join(os.tmpdir(), 'mcp1-stdio-'));
-  const projectKeys = ['ulterpos', 'tranquil', 'devspark', 'social-apps', 'renegade'] as const;
+  const projectKeys = ['ulterpos', 'tranquil', 'ulternet', 'social-apps', 'renegade'] as const;
   const projectRoots = Object.fromEntries(projectKeys.map((key) => [key, path.join(fixtureRoot, key)])) as Record<(typeof projectKeys)[number], string>;
   for (const key of projectKeys) {
     await mkdir(path.join(projectRoots[key], 'docs'), { recursive: true });
@@ -23,7 +23,7 @@ test('personal stdio server serves safe files and documentation resources from c
     NODE_ENV: 'test',
     PROJECT_ULTERPOS_PATH: projectRoots.ulterpos,
     PROJECT_TRANQUIL_PATH: projectRoots.tranquil,
-    PROJECT_DEVSPARK_PATH: projectRoots.devspark,
+    PROJECT_ULTERNET_PATH: projectRoots.ulternet,
     PROJECT_SOCIAL_APPS_PATH: projectRoots['social-apps'],
     PROJECT_RENEGADE_PATH: projectRoots.renegade,
   };
@@ -40,7 +40,7 @@ test('personal stdio server serves safe files and documentation resources from c
     const projectsResult = await client.callTool({ name: 'project_list', arguments: {} });
     const projectPayload = projectsResult.content as Array<{ text?: string }>;
     const projects = JSON.parse(projectPayload[0]?.text ?? '[]') as Array<{ key: string }>;
-    const expected = ['ulterpos', 'tranquil', 'devspark', 'social-apps', 'renegade'];
+    const expected = ['ulterpos', 'tranquil', 'ulternet', 'social-apps', 'renegade'];
     assert.deepEqual(projects.map(({ key }) => key).sort(), expected.sort());
 
     for (const project of expected) {

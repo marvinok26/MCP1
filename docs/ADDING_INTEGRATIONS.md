@@ -34,7 +34,7 @@ Choose a low-risk, read-only workflow with a documented API and synthetic/stagin
 
 - UlterPOS: a branch-scoped operational summary.
 - Tranquil: a sync/queue status without patient details.
-- Devspark: list draft page identifiers and review status.
+- UlterNet website: list draft page identifiers and review status.
 - Social apps: defer until its user workflows and supported channels are defined.
 - Renegade: event status and ticket scan totals without attendee details.
 

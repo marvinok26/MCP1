@@ -6,7 +6,7 @@ export type ProjectConfig = { key: string; name: string; root: string };
 const projectDefinitions = [
   ['ulterpos', 'UlterPOS', 'PROJECT_ULTERPOS_PATH', '/home/seint/Dev/Work/pos/ulterpos'],
   ['tranquil', 'Tranquil Pharmacy', 'PROJECT_TRANQUIL_PATH', '/home/seint/Dev/Work/tranquil'],
-  ['devspark', 'Devspark', 'PROJECT_DEVSPARK_PATH', '/home/seint/Dev/Self/Apps/UlterNet-Systems/Company/UlterNet/website/devspark'],
+  ['ulternet', 'UlterNet website', 'PROJECT_ULTERNET_PATH', '/home/seint/Dev/Self/Apps/UlterNet-Systems/Company/UlterNet/website/devspark'],
   ['social-apps', 'Social apps', 'PROJECT_SOCIAL_APPS_PATH', '/home/seint/Dev/Self/Apps/UlterNet-Systems/Social/social-apps'],
   ['renegade', 'Renegade Tickets & Events', 'PROJECT_RENEGADE_PATH', '/home/seint/Dev/Self/Apps/UlterNet-Systems/Tickets&Events/renegade/website/renegade'],
 ] as const;

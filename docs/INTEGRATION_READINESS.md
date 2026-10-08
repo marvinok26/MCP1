@@ -14,11 +14,11 @@ This inventory records the existing application API and authentication boundarie
 
 **MCP path:** use staff identity and the existing staff middleware for any future pharmacy tool. Never reuse platform operator credentials for clinic workflows. Avoid patient-level data in summaries unless caller permissions and `FieldAccess` allow every returned field. Start with a sync-health/queue summary that omits patient and sale details.
 
-## Devspark
+## UlterNet website
 
 `routes/api.php` defines admin APIs under `/api/v1` with `web`, `admin`, and `throttle:api` middleware. The frontend authenticates with a session cookie; writes also use CSRF protection.
 
-**MCP path:** add a narrow server-to-server authentication mechanism or a supported delegated session bridge in Devspark. Preserve its admin authorization and audit behavior. Draft preparation can happen outside the publishing endpoint; publishing remains a separate confirmed action. Contact-message tools must avoid exposing full sender content unnecessarily.
+**MCP path:** add a narrow server-to-server authentication mechanism or a supported delegated session bridge in the UlterNet website. Preserve its admin authorization and audit behavior. Draft preparation can happen outside the publishing endpoint; publishing remains a separate confirmed action. Contact-message tools must avoid exposing full sender content unnecessarily.
 
 ## Social apps
 
@@ -32,7 +32,7 @@ The inspected checkout has organizer routes protected by `auth`, `verified`, and
 
 **MCP path:** introduce a narrow authenticated API in Renegade before exposing event, ticket, settlement, or finance data. Enforce organizer ownership/event scope and preserve the existing finance/refund boundaries. Start with event status and aggregate ticket-scan counts; do not return attendee data. Refunds and settlement actions require their own permission, preview, confirmation, idempotency, and audit events.
 
-## Social apps visibility and Devspark content
+## Social apps visibility and UlterNet website content
 
 Tools that can reach customers or publish content are externally visible actions. Keep draft-generation and draft-review separate from sending or publishing. Require a named operator permission, content/recipient preview, explicit confirmation, duplicate prevention, and an application-owned audit record before enabling any publishing or messaging action.
 
@@ -55,7 +55,7 @@ See [Business identity and client authentication](IDENTITY.md) for the selected 
 | --- | --- | --- |
 | UlterPOS | Operational data currently uses authenticated web routes | Add a tenant/branch scoped read endpoint |
 | Tranquil | Versioned Sanctum API with staff and branch middleware | Sync status summary with no patient details |
-| Devspark | Session and CSRF protected admin API | Authenticated draft listing/review API |
+| UlterNet website | Session and CSRF protected admin API | Authenticated draft listing/review API |
 | Social apps | Channel-specific API tokens; several endpoints send or control services | Read-only queue/instance health with token-safe auth |
 | Renegade | Organizer/admin web routes; no API route file | Event status and aggregate scan counts API |
 

@@ -5,7 +5,7 @@ import { audit } from './audit.js';
 import { requireScope, type BusinessIdentity } from './security.js';
 
 const projects = allProjects();
-const projectKey = z.enum(['ulterpos', 'tranquil', 'devspark', 'social-apps', 'renegade']);
+const projectKey = z.enum(['ulterpos', 'tranquil', 'ulternet', 'social-apps', 'renegade']);
 const textResult = (text: string) => ({ content: [{ type: 'text' as const, text }] });
 const maxConcurrentHealthChecks = Number(process.env.BUSINESS_MAX_CONCURRENT_HEALTH_CHECKS ?? 20);
 const healthCircuits = new Map<string, { failures: number; openUntil: number; probeInFlight: boolean }>();

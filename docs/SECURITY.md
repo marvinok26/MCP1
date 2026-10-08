@@ -18,7 +18,7 @@ Current business scopes:
 - `mcp:systems:list`
 - `system:ulterpos:health:read`
 - `system:tranquil:health:read`
-- `system:devspark:health:read`
+- `system:ulternet:health:read`
 - `system:social-apps:health:read`
 - `system:renegade:health:read`
 

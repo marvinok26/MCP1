@@ -1,6 +1,6 @@
 # MCP1 implementation to-do
 
-This is the working delivery checklist for personal and business MCP functionality across UlterPOS, Tranquil Pharmacy, Devspark, Social apps, and Renegade. Update the boxes in the same commit as the work. A checked item means its acceptance evidence exists; planning or documentation alone does not complete an implementation item.
+This is the working delivery checklist for personal and business MCP functionality across UlterNet Systems products: UlterPOS, Tranquil Pharmacy, the UlterNet website, Social apps, and Renegade. Update the boxes in the same commit as the work. A checked item means its acceptance evidence exists; planning or documentation alone does not complete an implementation item.
 
 **Status:** local and process-level foundation is implemented, and the cPanel staging service is live and verified. Remaining production work is gated on owner choices, operational checks, or implementation in the owning application repositories.
 
@@ -80,7 +80,7 @@ These changes belong in the respective application repositories. No record-level
 - [ ] Preserve `staff`, `branch`, `access`, `clinic.open`, record scopes, `FieldAccess`, and audit checks.
 - [ ] Verify offline queue status cannot expose or modify unsynced sale payloads.
 
-### Devspark
+### UlterNet website
 
 - [ ] Add a server-to-server or delegated identity path that preserves admin permissions and audit attribution.
 - [ ] Add read-only draft identifiers/status and draft preview endpoints with field minimization.
@@ -179,3 +179,4 @@ These changes belong in the respective application repositories. No record-level
 - **2026-10-08:** The first CI run failed because `personal-stdio.test.ts` assumed local project directories existed on hosted runners. Reworked it to create temporary fixtures for all five projects and verify documentation resource listing/read plus secret and hidden-path exclusion. Added readiness and circuit-breaker integration coverage. `npm run build` and all 10 tests pass locally; CI passed on both branches for `0c7472b` across Node 22/24, including the high-severity dependency audit.
 - **2026-10-08:** Added a host-neutral runbook for deployment/rollback, secret and signing-key rotation, incident response, backup/recovery, and monitoring. Host contacts, recovery objectives, privacy decisions, and staging rehearsal remain deployment prerequisites.
 - **2026-10-08:** Deployed MCP1 staging to `mcp-staging.ulternetsystems.com` on cPanel Web Apps with Node.js 24.21.0/npm 11.19.0. The owner chose to keep the checkout at the domain document root; server-local `.htaccess` rules deny direct access to repository/source/config paths, verified as 403. Build completed with `npm ci --include=dev`, `npm run build`, and `npm prune --omit=dev`; npm reported zero vulnerabilities. `/healthz` and `/readyz` return 200, unauthenticated `/mcp` returns 401, and protected-resource metadata returns 404 while discovery is disabled. Client protocol interoperability, provider setup, logs, limits, and recovery remain pending.
+- **2026-10-08:** The owner clarified that UlterNet Systems is the parent organization for all five products. Changed the UlterNet website's user-facing project name and key while keeping its physical repository folder `devspark`; all product permissions and application data boundaries remain separate. Reviewed Auth0's current pricing/feature documentation: Custom Token Exchange is Early Access and plan-gated, and actor-token exchange cannot use MFA in that transaction. Keep Auth0 provisional pending client, plan, and MFA compatibility review.

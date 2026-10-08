@@ -4,7 +4,9 @@
 
 The owner confirmed that the organization is not currently using an identity provider and instructed that the Auth0 recommendation remain provisional. The remote client set is several clients or not decided. No provider has been selected. When the organization chooses one, MCP1 must use that workforce OIDC provider rather than creating a second staff directory.
 
-**Provisional recommendation:** evaluate Auth0 as the managed OIDC provider for the first business pilot. It avoids operating the identity control plane alongside the MCP service on shared hosting and its documentation covers Authorization Code + PKCE and dynamic client registration. This is a recommendation, not a selected provider: first validate the actual MCP clients, organization domain, account ownership, cost, and provider behavior. Keep client authentication standards-based so a later issuer change does not alter MCP scopes or application APIs. If the team chooses self-hosted Keycloak, run it on a separately managed VPS/container with a production database, TLS, backups, recovery, monitoring, and a high-availability plan; do not place the identity service on cPanel shared hosting.
+UlterNet Systems is the parent organization for UlterPOS, Tranquil Pharmacy, the UlterNet website, Social apps, and Renegade. Use one workforce identity boundary for UlterNet staff across these products, with a separate development/staging environment from production. Keep product scopes distinct, and let each product's API enforce its own staff permissions, tenant/branch or ownership scope, and audit trail. Auth0 Organizations are primarily useful when modeling separate customer organizations; they are not required just because UlterNet owns several products.
+
+**Provisional recommendation:** evaluate Auth0 as the managed OIDC provider for the first business pilot. It avoids operating the identity control plane alongside the MCP service on shared hosting and supports standard OIDC and Authorization Code + PKCE. This is a recommendation, not a selected provider: first validate the actual MCP clients, organization domain, account ownership, cost, client registration behavior, and provider feature availability. Keep client authentication standards-based so a later issuer change does not alter MCP scopes or application APIs. If the team chooses self-hosted Keycloak, run it on a separately managed VPS/container with a production database, TLS, backups, recovery, monitoring, and a high-availability plan; do not place the identity service on cPanel shared hosting.
 
 Provider acceptance requirements:
 
@@ -14,6 +16,9 @@ Provider acceptance requirements:
 - A separate machine-to-machine client-credentials grant only for named, non-human automation. Its subject and scopes must identify the service and must not impersonate a staff member.
 - Central staff onboarding/offboarding and a tested process to remove grants and invalidate active credentials. Signed self-contained JWTs remain valid until expiry unless the provider offers an introspection/revocation mechanism that MCP1 adopts.
 - Narrow MCP audience and scopes. Per-application permissions and record access still have to be checked by each owning application.
+- If delegated downstream actor tokens are needed, prove the selected provider can issue them with the required user/actor claims, scopes, and MFA policy before choosing it.
+
+**Auth0-specific evaluation item (reviewed 2026-10-08):** Auth0 Custom Token Exchange follows RFC 8693 but is currently documented as Early Access and limited to Professional/Enterprise plan tiers. Auth0 also documents that an exchange using `actor_token` cannot use MFA in that transaction. This may conflict with UlterNet's staff security requirements, so do not assume the preferred downstream-token pattern will be available on a low-cost plan or work with the required MFA policy. MCP1 currently validates bearer JWTs; it does not yet implement interactive OAuth login, client registration, or downstream token exchange.
 
 If another managed provider is preferred, compare its client compatibility, staff lifecycle controls, MFA, audit export, token audience/scope support, data region, pricing, and incident support before selecting it.
 
@@ -39,7 +44,7 @@ The bridge must fail closed when the identity link is missing, disabled, ambiguo
 | --- | --- |
 | **UlterPOS** | Add versioned API endpoints behind an actor-token verifier. Resolve the local user and business context from the identity link; retain existing permissions, active vertical/team scope, branch scope, subscription behavior, field restrictions, and audit trail. |
 | **Tranquil Pharmacy** | Add an actor-token verifier for the selected versioned staff API and resolve a local clinic staff user. Run existing staff, preview, branch, access, idle-timeout, clinic-open, record, and `FieldAccess` checks. Never resolve the platform-admin guard for staff work. |
-| **Devspark** | Add an actor-token verifier and identity link, plus narrow content read/draft permissions. The existing binary `is_admin` middleware is not a sufficient record-scope grant. |
+| **UlterNet website** | Add an actor-token verifier and identity link, plus narrow content read/draft permissions. The existing binary `is_admin` middleware is not a sufficient record-scope grant. |
 | **Social apps** | Add an actor-token verifier and map to the authenticated application user. Apply instance ownership for every read or write; keep channel API credentials behind the app. |
 | **Renegade** | Add a versioned API and actor-token verifier. Apply event organizer ownership for organizer tools; keep platform administration and finance actions separately permissioned and audited. |
 
