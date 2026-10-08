@@ -53,6 +53,8 @@ cPanel capabilities vary by provider. A working Node website is not sufficient p
 
 On 2026-10-08, the cPanel account successfully ran the staging service at `https://mcp-staging.ulternetsystems.com` using Node.js 24.21.0 and npm 11.19.0. Passenger served `/healthz` and `/readyz` with 200 responses; `/mcp` returned 401 without a bearer token, and protected-resource metadata returned 404 with OAuth discovery disabled. The repository checkout is at the domain document root by owner choice. A server-local `.htaccess` denies direct requests to `.git`, environment/config files, source, documentation, tests, build output, and dependency folders; probes for representative files returned 403. Re-run these probes after any cPanel app or `.htaccess` change.
 
+After the owner restarted the cPanel app following the latest `development` deployment, the same status and access-control probes returned the expected responses again: `/healthz` and `/readyz` 200, `/mcp` 401, OAuth metadata 404, and `package.json` plus `src/business.ts` 403. This verifies restart recovery and the current static-file deny rules; persistent audit-log behavior, outbound network restrictions, and resource limits remain to be checked.
+
 The cPanel app environment contains the staging host allowlist, disabled OAuth discovery, and a private audit-log path outside the document root. The identity-provider issuer, audience, and JWKS URL remain unset until a provider is selected. Build in the cPanel Node environment with `npm ci --include=dev`, `npm run build`, then `npm prune --omit=dev`. Keep cPanel's Passenger directives when maintaining the local `.htaccess` rules; the cPanel-specific file is excluded locally through `.git/info/exclude` and is not committed.
 
 ## Scaling path

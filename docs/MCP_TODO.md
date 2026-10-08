@@ -56,7 +56,8 @@ This is the working delivery checklist for personal and business MCP functionali
 - [x] Deploy a non-production MCP endpoint behind HTTPS and configure the exact Host allowlist; browser Origin access remains closed because no browser client has been selected.
 - [ ] Verify the chosen MCP client can initialize and make tool calls through the cPanel proxy; check required headers, POST behavior, and streaming behavior.
 - [x] Confirm Passenger routing/port binding and cPanel environment-variable configuration through successful health/readiness responses.
-- [ ] Exercise restart/redeploy, verify log persistence, outbound host controls, and record process/resource limits.
+- [x] Restart the cPanel app after deployment and repeat the staging smoke checks: `/healthz` and `/readyz` returned 200, unauthenticated `/mcp` returned 401, OAuth metadata returned 404 while disabled, and repository/source probes returned 403.
+- [ ] Verify log persistence, outbound host controls, and record process/resource limits.
 - [ ] Configure trusted-proxy IP handling only if the proxy overwrites forwarded-address headers.
 - [ ] Verify health endpoint credentials, timeout, TLS, redirect rejection, and safe failure behavior.
 - [ ] Record capacity limits and a tested move path to a VPS/container host.
