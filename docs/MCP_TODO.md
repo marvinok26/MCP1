@@ -113,7 +113,7 @@ These changes belong in the respective application repositories. No record-level
 
 ## Phase 5 — Business MCP adapters
 
-- [x] Implement an opt-in read-only Google reporting adapter for configured GA4 and Search Console properties: aggregate channel and landing-page metrics plus Search Console page performance; bound ranges/results, remove query strings, omit search terms/identifiers, and use per-system scopes.
+- [x] Implement an opt-in read-only Google reporting adapter for configured GA4 properties/streams and Search Console properties: aggregate channel and landing-page metrics plus Search Console page performance; filter GA4 to each configured stream, bound ranges/results, remove query strings, omit search terms/identifiers, and use per-system scopes.
 - [ ] Configure Google reporting in staging with least-privilege service-account access to the intended properties; confirm live responses and insufficient-permission failures without exposing credentials.
 - [ ] Implement one typed adapter per application using fixed route mappings and application-owned APIs.
 - [ ] Propagate delegated identity or exchanged short-lived tokens; never trust a caller-supplied user ID/role header.

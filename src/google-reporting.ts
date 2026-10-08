@@ -60,6 +60,23 @@ function configuredProperty(system: ReportingSystem, key: 'GOOGLE_ANALYTICS_PROP
   return value;
 }
 
+function configuredAnalyticsStreamId(system: ReportingSystem): string {
+  const value = parseMap('GOOGLE_ANALYTICS_STREAM_IDS').get(system);
+  if (!value || !/^\d{5,20}$/.test(value)) {
+    throw new Error(`A numeric GA4 stream ID is required for ${system} to keep reports scoped to that site`);
+  }
+  return value;
+}
+
+function streamDimensionFilter(streamId: string) {
+  return {
+    filter: {
+      fieldName: 'streamId',
+      stringFilter: { matchType: 'EXACT', value: streamId },
+    },
+  };
+}
+
 function validateDateRange(startDate: string, endDate: string): void {
   const datePattern = /^\d{4}-\d{2}-\d{2}$/;
   if (!datePattern.test(startDate) || !datePattern.test(endDate)) throw new Error('Dates must use YYYY-MM-DD format');
@@ -190,8 +207,10 @@ function analyticsItems(payload: Record<string, unknown>, labels: string[]): Arr
 export async function analyticsChannelSummary(system: ReportingSystem, startDate: string, endDate: string) {
   validateDateRange(startDate, endDate);
   const propertyId = configuredProperty(system, 'GOOGLE_ANALYTICS_PROPERTY_IDS');
+  const streamId = configuredAnalyticsStreamId(system);
   const payload = await googlePost(`${analyticsApi}/properties/${propertyId}:runReport`, 'https://www.googleapis.com/auth/analytics.readonly', {
     dateRanges: [{ startDate, endDate }],
+    dimensionFilter: streamDimensionFilter(streamId),
     dimensions: [{ name: 'sessionDefaultChannelGroup' }],
     metrics: [{ name: 'sessions' }, { name: 'activeUsers' }, { name: 'keyEvents' }],
     metricAggregations: ['TOTAL'],
@@ -204,8 +223,10 @@ export async function analyticsChannelSummary(system: ReportingSystem, startDate
 export async function analyticsLandingPageSummary(system: ReportingSystem, startDate: string, endDate: string) {
   validateDateRange(startDate, endDate);
   const propertyId = configuredProperty(system, 'GOOGLE_ANALYTICS_PROPERTY_IDS');
+  const streamId = configuredAnalyticsStreamId(system);
   const payload = await googlePost(`${analyticsApi}/properties/${propertyId}:runReport`, 'https://www.googleapis.com/auth/analytics.readonly', {
     dateRanges: [{ startDate, endDate }],
+    dimensionFilter: streamDimensionFilter(streamId),
     dimensions: [{ name: 'landingPage' }],
     metrics: [{ name: 'sessions' }, { name: 'activeUsers' }, { name: 'keyEvents' }],
     metricAggregations: ['TOTAL'],

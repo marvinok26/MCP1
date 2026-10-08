@@ -36,7 +36,7 @@ Application record tools must additionally call application APIs using a delegat
 - Schemas validate tool arguments before handlers run.
 - Input body size is limited to 1 MB and the SDK tool-argument element count is bounded.
 - Health endpoint URLs are operator configuration, require HTTPS, reject embedded credentials and fragments, and refuse redirects.
-- Google reporting uses fixed Google API hosts, read-only OAuth scopes, allowlisted configured properties, short-lived service-account access tokens, fixed report shapes, and bounded dates, result counts, response sizes, and request times. Search terms and visitor identifiers are excluded; query strings are removed from landing-page paths.
+- Google reporting uses fixed Google API hosts, read-only OAuth scopes, allowlisted configured properties and GA4 streams, short-lived service-account access tokens, fixed report shapes, and bounded dates, result counts, response sizes, and request times. Search terms and visitor identifiers are excluded; query strings are removed from landing-page paths.
 - Personal paths are resolved through `realpath`, checked against the configured project root, and filtered for sensitive/generated paths.
 - Personal Google reports use the same fixed read-only Google API calls and bounds as business mode. The local `.env` service-account credential is an owner-controlled capability; never copy it into a project, client prompt, or source control.
 - External commands use `execFile` with fixed executable names and argument arrays. User text is never evaluated by a shell.
