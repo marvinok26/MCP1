@@ -12,7 +12,7 @@ Current MCP scope names:
 
 | Scope | Meaning | Grant policy |
 | --- | --- | --- |
-| `mcp:systems:list` | List systems for which the actor has health access | Grant only to named business users approved to discover integrations |
+| `mcp:systems:list` | Discover the registered system names and keys | Grant only to named business users approved to discover the system catalog; this does not grant health or reporting access |
 | `system:<system>:health:read` | Call that system's configured, minimal health endpoint | Grant per system to approved operations/support staff; health access is not inherited from an app role |
 | `system:<system>:marketing:read` | Read aggregate GA4 and Search Console summaries for the system's explicitly configured public-site properties | Grant only to named marketing/management users approved to view those site's acquisition metrics; service-account property access is read-only and separately limited to configured properties |
 

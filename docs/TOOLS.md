@@ -25,13 +25,13 @@ The stdio server exposes one `project-documentation` resource template with URIs
 
 | Tool | Required scope | Purpose | Data/action |
 | --- | --- | --- | --- |
-| `business_systems_list` | `mcp:systems:list` and per-system `system:<key>:health:read` | List health integrations the caller may inspect | Configuration metadata only |
+| `business_systems_list` | `mcp:systems:list` | List the five registered business systems | Names and keys only; does not grant access to system tools |
 | `business_system_health` | `system:<key>:health:read` | Call a configured HTTPS health endpoint | Read-only; returns system key, reachability, and HTTP status |
 | `marketing_channel_summary` | `system:<key>:marketing:read` | Summarize GA4 sessions, active users, and key events by acquisition channel | Aggregate only; maximum 25 channels and 90-day range |
 | `marketing_landing_pages` | `system:<key>:marketing:read` | Summarize GA4 sessions, active users, and key events by landing-page path | Aggregate only; maximum 25 paths, query strings removed, 90-day range |
 | `marketing_search_performance` | `system:<key>:marketing:read` | Summarize Search Console clicks, impressions, CTR, average position, and top page paths | Aggregate only; top 25 pages, no search terms or visitor identifiers, 90-day range |
 
-The `system` input accepts one of the five project keys. A health URL and optional bearer token are configured per system. Redirects are refused, and only HTTPS URLs are accepted.
+The `system` input accepts one of the five project keys. The catalog lists registered systems even when their health integrations are not configured. A health URL and optional bearer token are configured per system; health checks also require that system's `health:read` scope. Redirects are refused, and only HTTPS URLs are accepted. Marketing tools require the corresponding system's `marketing:read` scope and Google reporting configuration.
 
 Google reporting is opt-in per system. Configure `GOOGLE_ANALYTICS_PROPERTY_IDS` as comma-separated `system=numeric-property-id` pairs, `GOOGLE_ANALYTICS_STREAM_IDS` as `system=numeric-stream-id` pairs, and `GOOGLE_SEARCH_CONSOLE_SITES` as `system=property` pairs. The GA4 Measurement ID beginning with `G-` is not the numeric Data API property or stream ID. Analytics reports are filtered by the configured stream so sites sharing a property remain separate in MCP results. Google authentication uses a dedicated service account with viewer/read access only to the configured properties; the private key stays in protected host environment settings. API scopes are read-only, access tokens are short-lived and cached in memory until near expiry, Google redirects are refused, requests have fixed API endpoints, a 90-day date cap, bounded result counts and timeouts, and provider payloads/errors are not written to business audit logs.
 

@@ -80,14 +80,12 @@ async function audited<T>(identity: BusinessIdentity, requestId: string, tool: s
 
 export function registerBusinessTools(server: McpServer, identity: BusinessIdentity, requestId: string): void {
   server.registerTool('business_systems_list', {
-    title: 'List available business systems',
-    description: 'List configured systems the authenticated user has permission to inspect.',
+    title: 'List registered business systems',
+    description: 'List the business systems registered with MCP1. This directory does not grant access to system tools; health checks and reports each require their own system-specific permission.',
   }, async () => audited(identity, requestId, 'business_systems_list', async () => {
     requireScope(identity, 'mcp:systems:list');
-    const available = projects
-      .filter((project) => identity.scopes.has(`system:${project.key}:health:read`) && integrationFor(project.key))
-      .map(({ key, name }) => ({ key, name }));
-    return textResult(JSON.stringify(available, null, 2));
+    const systems = projects.map(({ key, name }) => ({ key, name }));
+    return textResult(JSON.stringify(systems, null, 2));
   }));
 
   server.registerTool('business_system_health', {

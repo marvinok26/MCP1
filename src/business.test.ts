@@ -131,7 +131,13 @@ test('Streamable HTTP exposes scoped tools and writes redacted audit records', a
     const list = await client.callTool({ name: 'business_systems_list', arguments: {} });
     assert.equal(list.isError, undefined);
     const content = list.content as Array<{ type?: string; text?: string }>;
-    assert.equal(content[0]?.text, '[]');
+    assert.deepEqual(JSON.parse(content[0]?.text ?? 'null'), [
+      { key: 'ulterpos', name: 'UlterPOS' },
+      { key: 'tranquil', name: 'Tranquil Pharmacy' },
+      { key: 'ulternet', name: 'UlterNet website' },
+      { key: 'social-apps', name: 'Social apps' },
+      { key: 'renegade', name: 'Renegade Tickets & Events' },
+    ]);
 
     const denied = await client.callTool({ name: 'business_system_health', arguments: { system: 'ulterpos' } });
     assert.equal(denied.isError, true);
@@ -225,7 +231,13 @@ test('business Streamable HTTP enforces signed-token claims and tool scopes end 
       assert.deepEqual(tools.map((tool) => tool.name).sort(), ['business_system_health', 'business_systems_list', 'marketing_channel_summary', 'marketing_landing_pages', 'marketing_search_performance']);
       const systems = await client.callTool({ name: 'business_systems_list', arguments: {} });
       assert.equal(systems.isError, undefined);
-      assert.equal(((systems.content as Array<{ text?: string }>)[0])?.text, '[]');
+      assert.deepEqual(JSON.parse(((systems.content as Array<{ text?: string }>)[0])?.text ?? 'null'), [
+        { key: 'ulterpos', name: 'UlterPOS' },
+        { key: 'tranquil', name: 'Tranquil Pharmacy' },
+        { key: 'ulternet', name: 'UlterNet website' },
+        { key: 'social-apps', name: 'Social apps' },
+        { key: 'renegade', name: 'Renegade Tickets & Events' },
+      ]);
       const denied = await client.callTool({ name: 'business_system_health', arguments: { system: 'ulterpos' } });
       assert.equal(denied.isError, true);
     } finally {
