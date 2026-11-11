@@ -14,10 +14,10 @@
     "test": "vitest run src/personal.test.ts src/personal-stdio.test.ts src/security.test.ts src/business.test.ts"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.27.1",
+    "@modelcontextprotocol/sdk": "^1.32.2",
     "dotenv": "^16.6.1",
-    "express": "^5.1.0",
-    "jose": "^6.1.0",
+    "express": "^5.3.0",
+    "jose": "^6.2.15",
     "zod": "^4.6.7"
   },
   "devDependencies": {
@@ -25,6 +25,6 @@
     "@types/node": "^22.15.30",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
-    "vitest": "^5.0.3"
+    "vitest": "^5.1.0"
   }
 }
